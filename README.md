@@ -16,6 +16,8 @@ Comtrade data.
 
     - Must find the productcode for oak sawnwood 4407??
 
+        > "440791 - Wood; oak (Quercus spp.), sawn or chipped lengthwise, sliced or peeled, whether or not planed, sanded or finger-jointed, thicker than 6mm"
+
     - This is a select statement for one row in the database
 
 - What was the total import of oak sawnwood by Germany in 2025?
