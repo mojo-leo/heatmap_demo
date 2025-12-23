@@ -27,7 +27,6 @@ Test read with Pandas:
 import pandas
 import os
 import inspect
-import requests
 import zipfile
 
 # Get current directory
@@ -35,7 +34,7 @@ file_name = inspect.getframeinfo(inspect.currentframe()).filename
 this_dir = os.path.dirname(os.path.abspath(file_name)) + "/"
 
 # The path to the CSV file with all the data
-baci_file = this_dir + "../data/small.csv"
+baci_file = this_dir + "../data/BACI_HS22_Y2023_V202501.csv"
 
 
 def load_from_baci_dump(file_path, product_code):
