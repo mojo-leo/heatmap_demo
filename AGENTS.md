@@ -2,6 +2,7 @@
 # Development Workflow
 
 - Write commit hash to AGENTS.md when committing code
+
 - Follow NumPy docstrings, type hints, line length 88.
 - Comments should explain scientific rationale. Include references to relevant
   literature and standards where applicable
@@ -29,5 +30,7 @@ In single html file with css and javascript
 
 - Modified `load_from_baci_dump` function to accept `product_code` parameter and filter the DataFrame by product code.
 - Updated `if __name__ == "__main__"` section to pass 440791 as the product_code.
+
+- Implemented the `select_n_largest_partners` function to select the top n exporters and importers based on total trade quantity, aggregating the remaining partners into a "ROW" (Rest of the World) category.
 
 
