@@ -27,4 +27,7 @@ In single html file with css and javascript
   `load_from_baci_dump` from original BACI codes (t, i, j, k, v, q) to descriptive
   names: year, exporter, importer, product, value, quantity.
 
+- Modified `load_from_baci_dump` function to accept `product_code` parameter and filter the DataFrame by product code.
+- Updated `if __name__ == "__main__"` section to pass 440791 as the product_code.
+
 
