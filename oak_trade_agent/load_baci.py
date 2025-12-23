@@ -1,5 +1,5 @@
 """
-This script load trade data from the BACI website
+This script loads the trade data from the BACI website.
 
 Load the data from the BACI website:
 
@@ -10,7 +10,7 @@ Uncompress:
 
     unzip BACI_HS22_V202501.zip
 
-Test read with Pandas
+Test read with Pandas:
 
     import pandas
     df = pandas.read_csv("BACI_HS22_Y2023_V202501.csv")
@@ -24,6 +24,10 @@ Test read with Pandas
 """
 
 import pandas
+import os
+import inspect
+import requests
+import zipfile
 
 
 def load_from_baci_dump(file_path, product_code):
@@ -88,7 +92,7 @@ def select_n_largest_partners(df, n):
     0  2023         8       196   440791  12.811     4.596       Albania        Cyprus
     1  2023        36        32   440791  26.174    16.852     Australia     Argentina
 
-    Usage: 
+    Usage:
 
         cd /home/paul/rp/oak_trade_agent/
         ipython
@@ -203,8 +207,38 @@ def select_n_largest_partners(df, n):
     return df_copy
 
 
-if __name__ == "__main__":
-    df = load_from_baci_dump("data/BACI_HS22_Y2023_V202501.csv", 440791)
+def download_baci_file(baci_file):
+    """Downloads the baci file from the BACI website and uncompresses it."""
+    url = "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS22_V202501.zip"
+    response = requests.get(url)
+    with open(baci_file, "wb") as file:
+        file.write(response.content)
+    # Uncompress the file
+    with zipfile.ZipFile(baci_file, "r") as zip_ref:
+        zip_ref.extractall(cache_directory)
+
+
+def get_baci_file():
+    """Checks if the baci file is loacated in the cache firectory already.
+    If it is not, then it downloads it.
+    Returns the file path to the baci file.
+    """
+    # Get current directory
+    file_name = inspect.getframeinfo(inspect.currentframe()).filename
+    this_dir = os.path.dirname(os.path.abspath(file_name)) + "/"
+    cache_directory = this_dir + "../data/"
+    if not os.path.exists(cache_directory):
+        os.makedirs(cache_directory)
+    short_name = "BACI_HS22_Y2023_V202501.csv"
+    baci_file = os.path.join(cache_directory, short_name)
+    if not os.path.exists(baci_file):
+        download_baci_file(baci_file)
+    return baci_file
+
+
+def example():
+    baci_file = get_baci_file()
+    df = load_from_baci_dump(baci_file, 440791)
     # Oak sawnwood data
     selector = df["product"] == 440791
     oak = df.loc[selector].copy()
