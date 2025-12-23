@@ -25,7 +25,6 @@ Test read with Pandas
 
 import pandas
 
-
 def load_from_baci_dump(file_path, product_code):
     """Load from BACI dump file
 
@@ -75,5 +74,19 @@ def load_from_baci_dump(file_path, product_code):
 if __name__ == "__main__":
     df = load_from_baci_dump("data/BACI_HS22_Y2023_V202501.csv", 440791)
     # Oak sawnwood data
-    oak = df
-    #
+    selector = df["product"] == 440791
+    oak = df.loc[selector].copy()
+    selector = oak["exporter_name"] == "France"
+    selector &= oak["importer_name"] == "China"
+    oak.loc[selector]
+
+    # Show unique combination of country pairs
+    print("N exporters:", len(oak["exporter_name"].unique()))
+    print("N importers:", len(oak["importer_name"].unique()))
+    unique_pairs = oak[["exporter_name", "importer_name"]].drop_duplicates()
+    print(unique_pairs)
+
+    # Write to csv file for frontend
+    oak.to_csv("data/oak.csv", index=False)
+
+
