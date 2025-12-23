@@ -4,7 +4,7 @@ This script uses vega-lite to create a heatmap of the trade data.
 
 import pandas, altair, numpy
 
-from load_baci import load_from_baci_dump, baci_file
+from load_baci import load_from_baci_dump, baci_file, this_dir
 
 
 def main():
@@ -96,7 +96,7 @@ def main():
         )
     )
 
-    heatmap.save("trade_heatmap_topn.html")
+    heatmap.save(this_dir + "../output/trade_heatmap_topn.html")
     print("Saved trade_heatmap_topn.html — open it in your browser.")
 
 

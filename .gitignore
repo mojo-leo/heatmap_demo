@@ -1,5 +1,6 @@
-# Ignore data
+# Ignore data and output
 /data/
+/output/
 
 # Temporary files #
 .DS_Store
