@@ -82,7 +82,7 @@ def main():
         .encode(
             x=altair.X("exporter_name:N", sort="-x", title="Exporter country"),
             y=altair.Y("importer_name:N", sort="-x", title="Importer country"),
-            color=altair.Color("quantity:Q", title="Quantity"),
+            color=altair.Color("quantity:Q", title="Quantity (tons)"),
             tooltip=[
                 altair.Tooltip("exporter_name:N", title="Exporter"),
                 altair.Tooltip("importer_name:N", title="Importer"),
