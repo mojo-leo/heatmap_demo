@@ -60,11 +60,11 @@ def main():
     )
 
     # --- 2) Slider parameter for Top N ---
-    max_n = int(min(50, len(country_totals)))  # adjust if you want a bigger max
+    max_n = len(country_totals)  # adjust if you want a bigger max
     top_n = altair.param(
         name="top_n",
         value=min(20, max_n),
-        bind=altair.binding_range(min=5, max=max_n, step=1, name="Top N countries: "),
+        bind=altair.binding_range(min=2, max=max_n, step=1, name="Top N countries: "),
     )
 
     # --- 3) Heatmap: exporter (X) × importer (Y), color = sum(quantity) ---
@@ -75,18 +75,15 @@ def main():
             (altair.datum.exporter_rank <= top_n)
             & (altair.datum.importer_rank <= top_n)
         )
-        .transform_aggregate(
-            quantity_sum="sum(quantity)", groupby=["exporter_name", "importer_name"]
-        )
         .mark_rect()
         .encode(
             x=altair.X("exporter_name:N", sort="-x", title="Exporter country"),
             y=altair.Y("importer_name:N", sort="-x", title="Importer country"),
-            color=altair.Color("quantity_sum:Q", title="Quantity (sum)"),
+            color=altair.Color("quantity:Q", title="Quantity"),
             tooltip=[
                 altair.Tooltip("exporter_name:N", title="Exporter"),
                 altair.Tooltip("importer_name:N", title="Importer"),
-                altair.Tooltip("quantity_sum:Q", title="Quantity (sum)", format=",.3f"),
+                altair.Tooltip("quantity:Q", title="Quantity", format=",.3f"),
             ],
         )
         .properties(
