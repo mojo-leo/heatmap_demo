@@ -1,0 +1,11 @@
+name: oak
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - pandas
+  - ipython
+  - altair
+  - pip
+  - pip:
+    - py3-wget
