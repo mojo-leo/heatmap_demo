@@ -36,8 +36,6 @@ Comtrade data.
 
 Start with one agent only, we will add a planer and more complex agent crew later.
 
-
-
 An agent that:
 
 - Create appropriate SQL statements to answer the users question
@@ -47,5 +45,11 @@ An agent that:
 - Process output data tables in accordance with the question
 
 - Converts insights from the database into a textual answer and potentially a graph
+
+
+# Visualization
+
+The first prototype implements a Visualization
+
 
 
