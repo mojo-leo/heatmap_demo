@@ -10,8 +10,6 @@
 # Technologies
 
 Language: in python.
-Based on trade data from BACI.
-Sample data is based on oak roundwood and sawnwood, reference number 440791.
 
 # Operations Performed
 
