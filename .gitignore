@@ -1,8 +1,8 @@
-# Ignore data and output
-/data/
+# Ignore input data and output
+/input/
 /output/
 
-# Temporary files #
+# Temporary files
 .DS_Store
 *.pyc
 *.swp
@@ -12,6 +12,7 @@
 .#*
 ._*
 
-# IDE files #
+# IDE files
 /.idea
 /.vscode
+/.cursorignore
