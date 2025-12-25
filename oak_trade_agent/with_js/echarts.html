@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Heatmap</title>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <style>
+    #chart { width: 1000px; height: 850px; }
+  </style>
+</head>
+<body>
+  <label>Top N: <input id="topn" type="range" min="2" max="50" value="10"></label>
+  <span id="topnLabel">10</span>
+  <div id="chart"></div>
+
+  <script>
+    const chart = echarts.init(document.getElementById('chart'));
+
+    let rows = [];
+    let countries = [];     // global sorted order
+    let mat = null;         // full NxN matrix
+
+    function buildFullMatrix(rows) {
+      // compute totals for sorting
+      const expTot = new Map(), impTot = new Map();
+      for (const r of rows) {
+        expTot.set(r.exporter_name, (expTot.get(r.exporter_name) || 0) + r.quantity);
+        impTot.set(r.importer_name, (impTot.get(r.importer_name) || 0) + r.quantity);
+      }
+      const all = new Set([...expTot.keys(), ...impTot.keys()]);
+      countries = [...all].sort((a, b) => {
+        const ta = (expTot.get(a) || 0) + (impTot.get(a) || 0);
+        const tb = (expTot.get(b) || 0) + (impTot.get(b) || 0);
+        return tb - ta;
+      });
+
+      const idx = new Map(countries.map((c, i) => [c, i]));
+      const n = countries.length;
+
+      // dense matrix
+      mat = Array.from({length: n}, () => Array(n).fill(0));
+
+      for (const r of rows) {
+        const i = idx.get(r.importer_name);
+        const j = idx.get(r.exporter_name);
+        if (i != null && j != null) mat[i][j] += r.quantity;
+      }
+
+      // set slider max to available
+      const slider = document.getElementById('topn');
+      slider.max = String(Math.max(2, n));
+      if (Number(slider.value) > n) slider.value = String(Math.min(10, n));
+    }
+
+    function renderTopN(topN) {
+      const n = Math.max(2, Math.min(topN, countries.length));
+      const x = countries.slice(0, n);
+      const y = countries.slice(0, n);
+
+      // ECharts heatmap expects triplets [xIndex, yIndex, value]
+      const data = [];
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          const v = mat[i][j];
+          data.push([j, i, v]); // xIndex=j (exporter), yIndex=i (importer)
+        }
+      }
+
+      chart.setOption({
+        title: { text: `Exporter → Importer heatmap (Top ${n})` },
+        tooltip: {
+          position: 'top',
+          formatter: (p) => {
+            const exporter = x[p.data[0]];
+            const importer = y[p.data[1]];
+            const val = p.data[2];
+            return `<b>Exporter:</b> ${exporter}<br><b>Importer:</b> ${importer}<br><b>Quantity:</b> ${val.toLocaleString()}`;
+          }
+        },
+        grid: { left: 120, bottom: 120 },
+        xAxis: { type: 'category', data: x, axisLabel: { rotate: 45 } },
+        yAxis: { type: 'category', data: y, axisLabel: { } },
+        visualMap: { min: 0, calculable: true, orient: 'horizontal', left: 'center', bottom: 10 },
+        series: [{
+          type: 'heatmap',
+          data,
+          emphasis: { itemStyle: { shadowBlur: 10 } }
+        }]
+      }, true);
+    }
+
+    async function main() {
+      const resp = await fetch('/data');
+      rows = await resp.json();
+
+      // ensure quantity is number
+      rows = rows.map(r => ({...r, quantity: Number(r.quantity)}));
+
+      buildFullMatrix(rows);
+
+      const slider = document.getElementById('topn');
+      const label = document.getElementById('topnLabel');
+
+      function update() {
+        const n = Number(slider.value);
+        label.textContent = n;
+        renderTopN(n);
+      }
+
+      slider.addEventListener('input', update);
+      update();
+    }
+
+    main();
+  </script>
+</body>
+</html>
