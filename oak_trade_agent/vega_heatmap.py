@@ -1,104 +1,81 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-This script uses vega-lite to create a heatmap of the trade data.
+This object uses vega-lite to create a heatmap of the trade data.
 """
 
-import pandas, altair, numpy
-from pathlib import Path
+# Built-in modules
+import webbrowser
+from functools import cached_property
 
-from load_baci import load_from_baci_dump, baci_file, this_dir
+# Third-party modules
+import altair
 
-output_dir = Path(this_dir + "../output/")
-output_dir.mkdir(exist_ok=True)
+# Internal modules
+from oak_trade_agent.baci_dataset import baci
+from oak_trade_agent.paths import get_output_dir
 
-def main():
-    dataframe = load_from_baci_dump(baci_file, 440791)
 
-    # --- 1) Compute "largest countries" by total quantity (exports + imports) ---
-    export_totals = (
-        dataframe.groupby("exporter_name", as_index=False)["quantity"]
-        .sum()
-        .rename(columns={"exporter_name": "country", "quantity": "export_quantity"})
-    )
+###############################################################################
+class VegaHeatmap:
+    """Creates a vega-lite heatmap visualization of trade data."""
 
-    import_totals = (
-        dataframe.groupby("importer_name", as_index=False)["quantity"]
-        .sum()
-        .rename(columns={"importer_name": "country", "quantity": "import_quantity"})
-    )
-
-    country_totals = export_totals.merge(
-        import_totals, on="country", how="outer"
-    ).fillna(0.0)
-    country_totals["total_quantity"] = (
-        country_totals["export_quantity"] + country_totals["import_quantity"]
-    )
-
-    # Rank countries by total quantity (1 = largest)
-    country_totals = country_totals.sort_values(
-        "total_quantity", ascending=False
-    ).reset_index(drop=True)
-    country_totals["rank_total"] = numpy.arange(1, len(country_totals) + 1)
-
-    # Attach ranks back to each row for exporter and importer
-    dataframe_with_ranks = (
-        dataframe.merge(
-            country_totals[["country", "rank_total"]],
-            left_on="exporter_name",
-            right_on="country",
-            how="left",
+    @cached_property
+    def heatmap(self) -> altair.Chart:
+        # Calculate max_n from the dataframe ranks
+        df = baci.ranked_oak_df
+        max_n = int(max(df["exporter_rank"].max(), df["importer_rank"].max()))
+        # Slider parameter for Top N countries to display
+        top_n = altair.param(
+            name="top_n",
+            value=min(10, max_n),
+            bind=altair.binding_range(
+                min=2, max=max_n, step=1, name="Top # countries: "
+            ),
         )
-        .rename(columns={"rank_total": "exporter_rank"})
-        .drop(columns=["country"])
-    )
-
-    dataframe_with_ranks = (
-        dataframe_with_ranks.merge(
-            country_totals[["country", "rank_total"]],
-            left_on="importer_name",
-            right_on="country",
-            how="left",
+        # Heatmap: exporter (X) × importer (Y), color = sum(quantity)
+        heatmap = (
+            altair.Chart(baci.ranked_oak_df)
+            .add_params(top_n)
+            .transform_filter(
+                (altair.datum.exporter_rank <= top_n)
+                & (altair.datum.importer_rank <= top_n)
+            )
+            .mark_rect()
+            .encode(
+                x=altair.X("exporter_name:N", sort="-x", title="Exporter country"),
+                y=altair.Y("importer_name:N", sort="-x", title="Importer country"),
+                color=altair.Color("quantity:Q", title="Quantity (tons)"),
+                tooltip=[
+                    altair.Tooltip("exporter_name:N", title="Exporter"),
+                    altair.Tooltip("importer_name:N", title="Importer"),
+                    altair.Tooltip("quantity:Q", title="Quantity", format=",.3f"),
+                ],
+            )
+            .properties(
+                width=800,
+                height=800,
+                title="Exporter → Importer heatmap (filtered by Top-N total quantity)",
+            )
         )
-        .rename(columns={"rank_total": "importer_rank"})
-        .drop(columns=["country"])
-    )
+        return heatmap
 
-    # --- 2) Slider parameter for Top N ---
-    max_n = len(country_totals)  # adjust if you want a bigger max
-    top_n = altair.param(
-        name="top_n",
-        value=min(20, max_n),
-        bind=altair.binding_range(min=2, max=max_n, step=1, name="Top N countries: "),
-    )
-
-    # --- 3) Heatmap: exporter (X) × importer (Y), color = sum(quantity) ---
-    heatmap = (
-        altair.Chart(dataframe_with_ranks)
-        .add_params(top_n)
-        .transform_filter(
-            (altair.datum.exporter_rank <= top_n)
-            & (altair.datum.importer_rank <= top_n)
-        )
-        .mark_rect()
-        .encode(
-            x=altair.X("exporter_name:N", sort="-x", title="Exporter country"),
-            y=altair.Y("importer_name:N", sort="-x", title="Importer country"),
-            color=altair.Color("quantity:Q", title="Quantity (tons)"),
-            tooltip=[
-                altair.Tooltip("exporter_name:N", title="Exporter"),
-                altair.Tooltip("importer_name:N", title="Importer"),
-                altair.Tooltip("quantity:Q", title="Quantity", format=",.3f"),
-            ],
-        )
-        .properties(
-            width=800,
-            height=800,
-            title="Exporter → Importer heatmap (filtered by Top-N total quantity)",
-        )
-    )
-
-    heatmap.save(output_dir / "trade_heatmap_topn.html")
-    print("Saved trade_heatmap_topn.html — open it in your browser.")
+    def __call__(self) -> None:
+        """Create and save a vega-lite heatmap visualization."""
+        output_dir = get_output_dir()
+        output_dir.mkdir(exist_ok=True)
+        output_filename = "trade_heatmap_topn.html"
+        output_path = output_dir / output_filename
+        self.heatmap.save(output_path)
+        print(f"Saved {output_path} — open it in your browser.")
+        webbrowser.open(f"file://{output_path.absolute()}")
 
 
+###############################################################################
+# Make a singleton
+vega_heatmap = VegaHeatmap()
+
+# Run the singleton when run as a script
 if __name__ == "__main__":
-    main()
+    vega_heatmap()
