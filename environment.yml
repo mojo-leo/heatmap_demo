@@ -4,7 +4,9 @@ channels:
   - defaults
 dependencies:
   - pandas
+  - fsspec
   - ipython
+  - rich
   - altair
   - pip
   - pip:
