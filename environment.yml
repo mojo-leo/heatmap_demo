@@ -8,6 +8,10 @@ dependencies:
   - ipython
   - rich
   - altair
+  - plotly
+  - bokeh
+  - holoviews
+  - panel
   - pip
   - pip:
     - py3-wget
