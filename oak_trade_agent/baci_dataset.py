@@ -22,6 +22,7 @@ class BaciDataset:
 
     url = "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS22_V202501.zip"
     csv_name = "BACI_HS22_Y2023_V202501.csv"
+    md5_sum = "9fcebe4ce5e404db20f0040f9cf5f37f"
     col_names = {
         "t": "year",
         "i": "exporter",
@@ -53,7 +54,7 @@ class BaciDataset:
         msg = msg % (self.csv_name, self.zip_path, "OAK_TRADE_INPUT_DIR")
         title = "Large Download"
         rprint(Padding(Panel(msg, title=title, padding=2, expand=False), (2, 10)))
-        download_file(self.url, self.zip_path)
+        download_file(self.url, self.zip_path, md5=self.md5_sum)
 
     @property
     def df(self) -> pandas.DataFrame:
@@ -103,3 +104,7 @@ class BaciDataset:
 ###############################################################################
 # Make a singelton
 baci = BaciDataset()
+
+# Run the singleton when run as a script
+if __name__ == "__main__":
+    baci()
