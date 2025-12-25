@@ -5,10 +5,13 @@
 from functools import cached_property
 from pathlib import Path
 
-import fsspec
-
 # Third-party modules
+import fsspec
 import pandas
+from py3_wget import download_file
+from rich import print as rprint
+from rich.padding import Padding
+from rich.panel import Panel
 
 # Internal modules
 from oak_trade_agent.paths import get_input_dir
@@ -48,9 +51,8 @@ class BaciDataset:
             " override this by setting the $%s environment variable."
         )
         msg = msg % (self.csv_name, self.zip_path, "OAK_TRADE_INPUT_DIR")
-        # Download the file from the BACI website
-        from py3_wget import download_file
-
+        title = "Large Download"
+        rprint(Padding(Panel(msg, title=title, padding=2, expand=False), (2, 10)))
         download_file(self.url, self.zip_path)
 
     @property
