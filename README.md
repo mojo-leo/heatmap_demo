@@ -19,6 +19,6 @@ A graph that is interactive and can be seen in the browser.
 
 This is how you call the script:
 
-    $ python3 ./oak_trade_agent/vega_heatmap.py
+    $ python3 -m oak_trade_agent
 
-And it will populate the `output/` directory in which you will find an HTML file.
+And it will populate the `output/` directory in which you will find an HTML file. It will automatically open in your browser.

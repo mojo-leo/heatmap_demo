@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 # The main object of our package
-from oak_trade_agent import XXXX
+from oak_trade_agent import vega_heatmap
+
 
 # The main function to run when we are called #
 def main():
-    xx = XXXX(x)
-    return xx()
+    return vega_heatmap()
+
 
 # Execute when run, not when imported
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
