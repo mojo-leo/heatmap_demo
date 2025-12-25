@@ -67,7 +67,7 @@ class VegaHeatmap:
         """Create and save a vega-lite heatmap visualization."""
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
-        output_filename = "trade_heatmap_topn.html"
+        output_filename = "vega_heatmap_topn.html"
         output_path = output_dir / output_filename
         self.heatmap.save(output_path)
         print(f"Saved {output_path} — open it in your browser.")
