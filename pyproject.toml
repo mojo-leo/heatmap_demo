@@ -12,8 +12,8 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 
 authors = [
-  { name = "Paul Rougieux" }
-  { name = "Lucas Sinclair" },
+  { name = "Paul Rougieux" },
+  { name = "Lucas Sinclair" }
 ]
 
 urls = { Homepage = "https://github.com/mojo-leo/oak_trade_agent/" }
