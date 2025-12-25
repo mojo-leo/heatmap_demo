@@ -73,9 +73,43 @@ class BaciDataset:
 
     @property
     def country_codes(self) -> pandas.DataFrame:
+        """This file is actually corrupted on the source end.
+        Look for the mojibake bytes for "CÃ´te" stored as UTF-8:
+
+            with fsspec.open(path, mode="rb") as f:
+                blob = f.read(200_000)
+                needle = "CÃ´te".encode("utf-8")
+                print(needle)          # b'C\xc3\x83\xc2\xb4te'
+                print(needle in blob)  # True
+        """
         path = f"zip://country_codes_V202501.csv::{self.zip_path}"
-        with fsspec.open(path, mode="rt") as handle:
-            df = pandas.read_csv(handle)
+        with fsspec.open(path, mode="rb") as handle:
+            df = pandas.read_csv(handle, encoding="utf-8")
+
+        # Don't trust BACI to check their datasets, what does this mean for the rest
+        # of their work?
+        def fix_mojibake(s: str) -> str:
+            if isinstance(s, str):
+                try:
+                    return s.encode("latin1").decode("utf-8")
+                except UnicodeError:
+                    return s
+            return s
+
+        df = df.applymap(fix_mojibake)
+        # Replace some country names so they fit better in small graphs
+        df.replace(
+            {
+                "China, Hong Kong SAR": "Hong Kong",
+                "Bolivia (Plurinational State of)": "Bolivia",
+                "Bosnia Herzegovina": "Bosnia",
+                "Russian Federation": "Russia",
+                "Rep. of Korea": "Korea",
+                "Rep. of Moldova": "Moldova",
+                "United Arab Emirates": "UAE",
+            },
+            inplace=True,
+        )
         return df
 
     @cached_property
