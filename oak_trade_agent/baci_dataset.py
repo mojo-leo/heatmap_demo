@@ -92,6 +92,29 @@ class BaciDataset:
         )
         return df
 
+    @cached_property
+    def ranked_oak_df(self) -> pandas.DataFrame:
+        """Now we add country ranks based on total quantity (exports + imports).
+
+        year  exporter  importer  product  ...  exporter_name  importer_name exporter_rank importer_rank
+        2023       842       156   440791  ...    USA  China     1    2
+        2023       842       191   440791  ...    USA  Croatia   1    3
+        2023       842       251   440791  ...    USA  France    1    4
+        2023       842       276   440791  ...    USA  Germany   1    5
+        """
+        df = self.oak_df
+        exports = df.groupby("exporter_name")["quantity"].sum()
+        imports = df.groupby("importer_name")["quantity"].sum()
+        total = exports.add(imports, fill_value=0)
+        # 1 = largest
+        ranks = total.rank(ascending=False, method="first").astype("int64")
+        df = df.assign(
+            exporter_rank=df["exporter_name"].map(ranks),
+            importer_rank=df["importer_name"].map(ranks),
+        )
+        df.sort_values(by=["exporter_rank", "importer_rank"], inplace=True)
+        return df
+
     def __call__(self) -> None:
         """Print some diagnostics."""
         # Show unique combination of country pairs
