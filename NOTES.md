@@ -49,3 +49,27 @@ An agent that:
 # Visualization
 
 The first prototype implements only a visualization.
+
+
+# Sample data
+
+Load the data from the BACI website:
+
+    cd $HOME/repos/oak_trade_agent/data
+    wget https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS22_V202501.zip
+
+Uncompress:
+
+    unzip BACI_HS22_V202501.zip
+
+Test read with Pandas:
+
+    import pandas
+    df = pandas.read_csv("BACI_HS22_Y2023_V202501.csv")
+
+    # Oak sawnwood reference number
+    df.query("k == 440791")
+
+    There is a column k in the csv file and I only want to read the part of the
+    file with pandas for the value 440791 for sawnwood oak and the other 6
+    digit hs code from roundwood oak.
