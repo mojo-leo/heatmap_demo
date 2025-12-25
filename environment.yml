@@ -10,6 +10,7 @@ dependencies:
   - altair
   - plotly
   - bokeh
+  - dash
   - holoviews
   - panel
   - pip
