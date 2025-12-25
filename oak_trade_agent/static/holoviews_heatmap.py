@@ -101,4 +101,3 @@ holoviews_heatmap = HoloviewsHeatmap()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     holoviews_heatmap()
-
