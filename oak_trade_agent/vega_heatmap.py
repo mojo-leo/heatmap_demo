@@ -21,6 +21,8 @@ from oak_trade_agent.paths import get_output_dir
 class VegaHeatmap:
     """Creates a vega-lite heatmap visualization of trade data."""
 
+    title = "Exporter → Importer heatmap (filtered by Top-N total quantity)"
+
     @cached_property
     def heatmap(self) -> altair.Chart:
         # Calculate max_n from the dataframe ranks
@@ -34,7 +36,7 @@ class VegaHeatmap:
                 min=2, max=max_n, step=1, name="Top # countries: "
             ),
         )
-        # Heatmap: exporter (X) × importer (Y), color = sum(quantity)
+        # The main object that creates the heatmap
         heatmap = (
             altair.Chart(baci.ranked_oak_df)
             .add_params(top_n)
@@ -56,7 +58,7 @@ class VegaHeatmap:
             .properties(
                 width=800,
                 height=800,
-                title="Exporter → Importer heatmap (filtered by Top-N total quantity)",
+                title=self.title,
             )
         )
         return heatmap
