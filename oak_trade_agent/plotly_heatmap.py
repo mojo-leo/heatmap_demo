@@ -11,7 +11,6 @@ from functools import cached_property
 
 # Third-party modules
 import plotly.graph_objects as go
-import pandas
 
 # Internal modules
 from oak_trade_agent.baci_dataset import baci
@@ -24,7 +23,7 @@ class PlotlyHeatmap:
 
     @cached_property
     def heatmap(self) -> go.Figure:
-        """Create a plotly heatmap figure with top-N filtering."""
+        """Create a plotly heatmap figure with top-N filtering using a slider."""
         df = baci.ranked_oak_df
         max_n = int(max(df["exporter_rank"].max(), df["importer_rank"].max()))
         default_top_n = min(10, max_n)
@@ -44,14 +43,14 @@ class PlotlyHeatmap:
         importer_totals = (
             df.groupby("importer_name")["quantity"].sum().sort_values(ascending=False)
         )
-        all_countries = exporter_totals.index.union(importer_totals.index).unique()
         # Sort by total trade (exports + imports)
         country_totals = exporter_totals.add(importer_totals, fill_value=0)
         country_totals = country_totals.sort_values(ascending=False)
         sorted_countries = country_totals.index.tolist()
 
-        # Create buttons for different top-N values
-        buttons = []
+        # Create frames for slider (one frame per top-N value)
+        frames = []
+        slider_steps = []
         for n in range(2, max_n + 1):
             # Filter data for this top-N
             top_countries = sorted_countries[:n]
@@ -74,18 +73,44 @@ class PlotlyHeatmap:
                 columns=[c for c in sorted_countries if c in heatmap_matrix.columns],
             )
 
-            buttons.append(
-                dict(
-                    label=f"Top {n}",
-                    method="update",
-                    args=[
-                        {
-                            "z": [heatmap_matrix.values],
-                            "x": [heatmap_matrix.columns.tolist()],
-                            "y": [heatmap_matrix.index.tolist()],
-                        },
-                        {"title": f"Exporter → Importer heatmap (Top {n} countries)"},
+            # Create frame for this top-N value
+            frames.append(
+                go.Frame(
+                    data=[
+                        go.Heatmap(
+                            z=heatmap_matrix.values,
+                            x=heatmap_matrix.columns.tolist(),
+                            y=heatmap_matrix.index.tolist(),
+                            colorscale="Viridis",
+                            colorbar=dict(title="Quantity (tons)"),
+                            hovertemplate=(
+                                "<b>Exporter:</b> %{x}<br>"
+                                "<b>Importer:</b> %{y}<br>"
+                                "<b>Quantity:</b> %{z:,.3f} tons<br>"
+                                "<extra></extra>"
+                            ),
+                        )
                     ],
+                    name=str(n),
+                    layout=go.Layout(
+                        title=f"Exporter → Importer heatmap (Top {n} countries)"
+                    ),
+                )
+            )
+
+            # Create slider step
+            slider_steps.append(
+                dict(
+                    args=[
+                        [str(n)],
+                        {
+                            "frame": {"duration": 0, "redraw": True},
+                            "mode": "immediate",
+                            "transition": {"duration": 0},
+                        },
+                    ],
+                    label=f"Top {n}",
+                    method="animate",
                 )
             )
 
@@ -120,10 +145,11 @@ class PlotlyHeatmap:
                     "<b>Quantity:</b> %{z:,.3f} tons<br>"
                     "<extra></extra>"
                 ),
-            )
+            ),
+            frames=frames,
         )
 
-        # Update layout with dropdown menu
+        # Update layout with slider
         fig.update_layout(
             title=f"Exporter → Importer heatmap (Top {default_top_n} countries)",
             xaxis=dict(
@@ -137,16 +163,17 @@ class PlotlyHeatmap:
             ),
             width=800,
             height=800,
-            updatemenus=[
+            sliders=[
                 dict(
-                    type="dropdown",
-                    direction="down",
-                    showactive=True,
-                    x=0.1,
-                    xanchor="left",
-                    y=1.02,
-                    yanchor="top",
-                    buttons=buttons,
+                    active=default_top_n
+                    - 2,  # Index of default value (2 is first, so -2)
+                    currentvalue={
+                        "prefix": "Top # countries: ",
+                        "visible": True,
+                        "xanchor": "right",
+                    },
+                    pad={"t": 50},
+                    steps=slider_steps,
                 )
             ],
         )
@@ -157,7 +184,7 @@ class PlotlyHeatmap:
         """Create and save a plotly heatmap visualization."""
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
-        output_filename = "trade_heatmap_topn_plotly.html"
+        output_filename = "plotly_heatmap_topn.html"
         output_path = output_dir / output_filename
         self.heatmap.write_html(output_path)
         print(f"Saved {output_path} — open it in your browser.")
@@ -171,4 +198,3 @@ plotly_heatmap = PlotlyHeatmap()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     plotly_heatmap()
-
