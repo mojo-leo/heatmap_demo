@@ -11,6 +11,8 @@ dependencies:
   - plotly
   - bokeh
   - dash
+  - streamlit
+  - shiny
   - holoviews
   - panel
   - pip
