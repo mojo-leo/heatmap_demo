@@ -57,16 +57,16 @@ And it will populate the `output/` directory in which you will find an HTML file
 
 Several approches can be used to generate an interactive animated heatmap.
 
-### Static in Python
+### 1) Static in Python
 
-The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `plotly`, `holoviews` or even `bokeh` to obtain a similar result, but these tests have not been working very well.
+The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size.
 
 - [x] `oak_trade_agent.static.vega_static.py`
-- [ ] `oak_trade_agent.static.holoviews_static.py`
-- [ ] `oak_trade_agent.static.plotly_static.py`
+- [x] `oak_trade_agent.static.holoviews_static.py`
+- [x] `oak_trade_agent.static.plotly_static.py`
 - [x] `oak_trade_agent.static.bokeh_static.py`
 
-### Dynamic in Python
+### 2) Dynamic in Python
 
 Another approach is to write all the code in python and have a dynamic webapp that serves the content to the browser. This server can also communicate with the browser and answer requests (such as filtering the dataframe) as the user interacts with the dashboard.
 
@@ -82,12 +82,20 @@ Links:
 
 * https://hvplot.holoviz.org/en/docs/latest/index.html
 
-### Static in Javascript
+### 3) Static in Javascript
 
-The third approach is 
+The third approach is to depart from python, and create a single HTML file that imbeds the dataframe as well as the necessary javascript to perform all interactive operations on the client side.
 
+### 4) Dynamic in Javascript
 
-### Dynamic in Javascript
+The fourth approach is to start a simple RESTful python app that serves the dataframe as JSON HTTP to any client browser that requests it.
 
+### 5) Ship python runtime
 
-The fourth approach is 
+The fifth approach is to bundle a python runtime that is sent to client. This is about 40MB, and then we can run any python code directly client side.
+
+See this page that is using Panel running on Pyodide (WebAssembly):
+
+* https://panel.holoviz.org/how_to/interactivity/bind_function.html
+
+Or see "JupyterLite" where notebooks open and run without a backend kernel (also runs on Pyodide)
