@@ -132,8 +132,21 @@ class BaciDataset:
         return df
 
     @cached_property
+    def country_ranks(self) -> pandas.Series:
+        """
+        Now we compute country ranks based on total quantity (exports + imports).
+        1 = largest
+        """
+        exports = self.oak_df.groupby("exporter_name")["quantity"].sum()
+        imports = self.oak_df.groupby("importer_name")["quantity"].sum()
+        total = exports.add(imports, fill_value=0)
+        ranks = total.rank(ascending=False, method="first").astype("int64")
+        ranks.sort_values(ascending=True, inplace=True)
+        return ranks
+
+    @cached_property
     def ranked_oak_df(self) -> pandas.DataFrame:
-        """Now we add country ranks based on total quantity (exports + imports).
+        """Now we add those ranks to the dataframe.
 
         year  exporter  importer  product  ...  exporter_name  importer_name exporter_rank importer_rank
         2023       842       156   440791  ...    USA  China     1    2
@@ -142,14 +155,9 @@ class BaciDataset:
         2023       842       276   440791  ...    USA  Germany   1    5
         """
         df = self.oak_df
-        exports = df.groupby("exporter_name")["quantity"].sum()
-        imports = df.groupby("importer_name")["quantity"].sum()
-        total = exports.add(imports, fill_value=0)
-        # 1 = largest
-        ranks = total.rank(ascending=False, method="first").astype("int64")
         df = df.assign(
-            exporter_rank=df["exporter_name"].map(ranks),
-            importer_rank=df["importer_name"].map(ranks),
+            exporter_rank=df["exporter_name"].map(self.country_ranks),
+            importer_rank=df["importer_name"].map(self.country_ranks),
         )
         df.sort_values(by=["exporter_rank", "importer_rank"], inplace=True)
         return df
@@ -170,4 +178,3 @@ baci = BaciDataset()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     baci()
-
