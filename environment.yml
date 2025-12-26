@@ -19,6 +19,7 @@ dependencies:
   - ipywidgets
   - anywidget
   - fastapi
+  - voila
   - pip
   - pip:
     - py3-wget
