@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+
 # Built-in modules
 import json
+import os
 import subprocess
 import webbrowser
 from functools import cached_property
@@ -22,39 +24,40 @@ from oak_trade_agent.paths import get_output_dir
 class VoilaHeatmap:
     """
     Voilà app (dynamic, server-side kernel):
-    - ipywidgets slider updates a Plotly FigureWidget in-place.
-    - Uses ONE shared country ranking list for both axes (top N countries overall).
-    - __call__ writes a tiny .ipynb next to the outputs and launches `voila` via
-    a subprocess.
+    - ipywidgets slider updates a Plotly FigureWidget in-place
+    - Uses ONE shared country ranking list for both axes (top N countries overall)
+    - Builds the FULL pivot matrix once, then slices rows/cols for N
+    - __call__ writes a tiny .ipynb into outputs and launches `voila` via subprocess
     """
 
     title = "Exporter → Importer heatmap (Top-N countries by total quantity)"
 
-    # If you save this file elsewhere, update the import below
-    NOTEBOOK_IMPORT = "from oak_trade_agent.dynamic.voila_heatmap import voila_heatmap"
+    # If you move this file, update the import below
+    NOTEBOOK_IMPORT = "from oak_trade_agent.dynamic.voila_dynamic import voila_heatmap"
 
     @cached_property
     def df(self) -> pd.DataFrame:
-        return baci.ranked_oak_df.copy()
+        # cached_property already caches; no need to copy unless you mutate it
+        return baci.ranked_oak_df
 
     @cached_property
     def countries_ordered(self) -> list[str]:
-        # One shared Top-N list for both exporter and importer axes
-        # country_ranks: 1 = largest
-        return baci.country_ranks.sort_values(ascending=True).index.tolist()
+        # baci.country_ranks is already sorted ascending by rank (1 = largest)
+        return baci.country_ranks.index.tolist()
 
     @cached_property
     def max_n(self) -> int:
         return int(len(self.countries_ordered))
 
-    def _matrix_for_n(self, n: int) -> tuple[list[str], list[str], list[list[float]]]:
-        countries = self.countries_ordered[:n]
-        sub = self.df[
-            self.df["exporter_name"].isin(countries)
-            & self.df["importer_name"].isin(countries)
-        ][["exporter_name", "importer_name", "quantity"]]
+    @cached_property
+    def full_matrix(self) -> pd.DataFrame:
+        """
+        Full NxN pivot matrix across ALL ranked countries (rows=importers, cols=exporters).
+        Missing pairs filled with 0 so any slice is fully populated.
+        """
+        countries = self.countries_ordered
+        sub = self.df[["exporter_name", "importer_name", "quantity"]]
 
-        # Full NxN matrix (fill missing pairs with 0)
         mat = sub.pivot_table(
             index="importer_name",
             columns="exporter_name",
@@ -62,10 +65,14 @@ class VoilaHeatmap:
             aggfunc="sum",
             fill_value=0.0,
         ).reindex(index=countries, columns=countries, fill_value=0.0)
+        return mat
 
+    def _slice_for_n(self, n: int) -> tuple[list[str], list[str], list[list[float]]]:
+        countries = self.countries_ordered[:n]
+        mat_n = self.full_matrix.loc[countries, countries]  # rows then cols
         x = countries
         y = countries
-        z = mat.to_numpy().tolist()
+        z = mat_n.to_numpy().tolist()
         return x, y, z
 
     @cached_property
@@ -85,7 +92,7 @@ class VoilaHeatmap:
 
     @cached_property
     def fig(self) -> go.FigureWidget:
-        x, y, z = self._matrix_for_n(int(self.slider.value))
+        x, y, z = self._slice_for_n(int(self.slider.value))
         fig = go.FigureWidget(
             data=[
                 go.Heatmap(
@@ -117,7 +124,7 @@ class VoilaHeatmap:
         controls = widgets.HBox([self.slider, self.status])
 
         def update(n: int) -> None:
-            x, y, z = self._matrix_for_n(n)
+            x, y, z = self._slice_for_n(n)
             with self.fig.batch_update():
                 self.fig.data[0].x = x
                 self.fig.data[0].y = y
@@ -146,7 +153,7 @@ class VoilaHeatmap:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
 
-        nb_path = output_dir / "voila_heatmap_topn.ipynb"
+        nb_path = output_dir / "voila_dynamic.ipynb"
 
         nb = {
             "cells": [
@@ -156,6 +163,7 @@ class VoilaHeatmap:
                     "execution_count": None,
                     "outputs": [],
                     "source": [
+                        "import sys; print(sys.path)\n",
                         f"{self.NOTEBOOK_IMPORT}\n",
                         "voila_heatmap.show()\n",
                     ],
@@ -175,16 +183,13 @@ class VoilaHeatmap:
 
         nb_path.write_text(json.dumps(nb, indent=2), encoding="utf-8")
         print(f"Wrote Voilà notebook: {nb_path}")
+        env = os.environ.copy()
+        env["PYTHONPATH"] = str(get_output_dir().parent)
 
-        # Voilà will typically open a browser tab by default; if it doesn't in your env,
-        # it will print the local URL and you can open it manually.
         subprocess.run(
-            [
-                "voila",
-                str(nb_path),
-                "--strip_sources=True",
-            ],
+            ["voila", str(nb_path), "--strip_sources=True"],
             check=False,
+            env=env,
         )
 
 
