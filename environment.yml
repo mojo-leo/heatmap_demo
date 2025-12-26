@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - pandas
+  - tabulate
   - fsspec
   - rich
   - altair
