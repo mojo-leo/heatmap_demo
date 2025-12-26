@@ -10,15 +10,3 @@
 # Technologies
 
 Language: in python.
-
-# Operations Performed
-
-- 46022ba Renamed DataFrame columns in `scripts/load_baci_data.py` function
-  `load_from_baci_dump` from original BACI codes (t, i, j, k, v, q) to descriptive
-  names: year, exporter, importer, product, value, quantity.
-
-- Modified `load_from_baci_dump` function to accept `product_code` parameter and filter the DataFrame by product code.
-
-- Updated `if __name__ == "__main__"` section to pass 440791 as the product_code.
-
-- Implemented the `select_n_largest_partners` function to select the top n exporters and importers based on total trade quantity, aggregating the remaining partners into a "ROW" (Rest of the World) category.
