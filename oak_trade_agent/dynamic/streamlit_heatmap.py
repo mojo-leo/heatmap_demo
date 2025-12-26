@@ -13,7 +13,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 # Internal modules
-from oak_trade_agent.baci_dataset import baci
+from oak_trade_agent.data.baci_dataset import baci
 
 
 ###############################################################################

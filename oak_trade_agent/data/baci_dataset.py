@@ -165,3 +165,4 @@ baci = BaciDataset()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     baci()
+

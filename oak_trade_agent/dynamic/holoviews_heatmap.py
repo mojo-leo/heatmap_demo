@@ -13,7 +13,7 @@ import holoviews as hv
 import panel as pn
 
 # Internal modules
-from oak_trade_agent.baci_dataset import baci
+from oak_trade_agent.data.baci_dataset import baci
 
 # Set the backend for HoloViews
 hv.extension("bokeh")

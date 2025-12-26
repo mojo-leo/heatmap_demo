@@ -13,7 +13,7 @@ from functools import cached_property
 from d3blocks import D3Blocks
 
 # Internal modules
-from oak_trade_agent.baci_dataset import baci
+from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
 
 

@@ -8,3 +8,4 @@ class MultiBaciDataset:
     a time series of trade data."""
 
     pass
+

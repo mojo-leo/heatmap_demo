@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 # Internal modules
-from oak_trade_agent.baci_dataset import baci
+from oak_trade_agent.data.baci_dataset import baci
 
 ###############################################################################
 # Create the server
@@ -45,3 +45,4 @@ if __name__ == "__main__":
         port=8000,
         reload=True,
     )
+
