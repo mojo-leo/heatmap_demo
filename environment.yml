@@ -13,6 +13,7 @@ dependencies:
   - dash
   - streamlit
   - shiny
+  - shinywidgets
   - holoviews
   - panel
   - ipython
