@@ -15,13 +15,6 @@ from oak_trade_agent.data.baci_dataset import baci
 
 ###############################################################################
 class StreamlitHeatmap:
-    """
-    Streamlit app:
-    - Script reruns on every interaction
-    - Uses Streamlit caching to avoid recomputation
-    - Single Top-N country ranking for both axes
-    - Full pivot matrix built once, then sliced
-    """
 
     title = "Exporter → Importer heatmap (Top-N countries by total quantity)"
 
@@ -41,10 +34,7 @@ class StreamlitHeatmap:
 
     @st.cache_data(show_spinner=False)
     def full_matrix(self) -> pd.DataFrame:
-        """
-        Build the FULL NxN pivot matrix ONCE.
-        Cached across reruns.
-        """
+        """Build the FULL NxN pivot matrix ONCE. Cached across reruns."""
         countries = self.countries_ordered
         sub = self.df[["exporter_name", "importer_name", "quantity"]]
 
@@ -64,7 +54,6 @@ class StreamlitHeatmap:
 
     def render(self) -> None:
         """Render the Streamlit UI (called on every rerun)."""
-
         st.set_page_config(page_title=self.title, layout="wide")
         st.title(self.title)
 

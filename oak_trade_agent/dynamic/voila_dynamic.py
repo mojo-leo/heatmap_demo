@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 # Built-in modules
 import json
 import os
@@ -21,13 +20,6 @@ from oak_trade_agent.paths import get_output_dir
 
 ###############################################################################
 class VoilaHeatmap:
-    """
-    Voilà app (dynamic, server-side kernel):
-    - ipywidgets slider updates a Plotly FigureWidget in-place
-    - Uses ONE shared country ranking list for both axes (top N countries overall)
-    - Builds the FULL pivot matrix once, then slices rows/cols for N
-    - __call__ writes a tiny .ipynb into outputs and launches `voila` via subprocess
-    """
 
     title = "Exporter → Importer heatmap (Top-N countries by total quantity)"
 
@@ -50,10 +42,6 @@ class VoilaHeatmap:
 
     @cached_property
     def full_matrix(self) -> pd.DataFrame:
-        """
-        Full NxN pivot matrix across ALL ranked countries (rows=importers, cols=exporters).
-        Missing pairs filled with 0 so any slice is fully populated.
-        """
         countries = self.countries_ordered
         sub = self.df[["exporter_name", "importer_name", "quantity"]]
 

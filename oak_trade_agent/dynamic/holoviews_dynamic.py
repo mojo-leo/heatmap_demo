@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-This object uses HoloViews Server to create an interactive heatmap of the trade data.
-"""
-
 # Built-in modules
 from functools import cached_property
 
@@ -22,13 +18,11 @@ pn.extension()
 
 ###############################################################################
 class HoloviewsServerHeatmap:
-    """Creates a HoloViews Server interactive heatmap visualization of trade data."""
 
     title = "Exporter → Importer heatmap (filtered by Top-N total quantity)"
 
     @cached_property
     def heatmap(self) -> pn.Column:
-        """Create the holoviews heatmap visualization with interactive slider."""
         # Calculate max_n from the dataframe ranks
         df = baci.ranked_oak_df
         max_n = len(baci.country_ranks)
@@ -36,7 +30,6 @@ class HoloviewsServerHeatmap:
 
         # Create a function that generates the heatmap based on top_n
         def create_heatmap(top_n: int) -> hv.HeatMap:
-            """Create heatmap filtered by top_n countries."""
             filtered_df = df[
                 (df["exporter_rank"] <= top_n) & (df["importer_rank"] <= top_n)
             ]

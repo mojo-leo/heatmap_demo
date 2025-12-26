@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 # Built-in modules
-import os
 import subprocess
 from functools import cached_property
 from pathlib import Path
@@ -20,13 +18,6 @@ from oak_trade_agent.data.baci_dataset import baci
 
 ###############################################################################
 class ShinyHeatmap:
-    """
-    Shiny for Python app (dynamic, server-side):
-    - Reactive slider input (Top N)
-    - Full pivot matrix built once and cached
-    - On change, slice rows/cols of the cached matrix (fast)
-    - Uses a single Top-N country list for both axes (baci.country_ranks)
-    """
 
     title = "Exporter → Importer heatmap (Top-N countries by total quantity)"
 
@@ -45,10 +36,6 @@ class ShinyHeatmap:
 
     @cached_property
     def full_matrix(self) -> pd.DataFrame:
-        """
-        Full NxN pivot matrix across ALL ranked countries (rows=importers, cols=exporters).
-        Missing pairs filled with 0 so any slice is fully populated.
-        """
         countries = self.countries_ordered
         sub = self.df[["exporter_name", "importer_name", "quantity"]]
 
@@ -132,18 +119,6 @@ class ShinyHeatmap:
         return App(self.app_ui, self.server)
 
     def __call__(self) -> None:
-        """
-        Launch via the Shiny CLI as a subprocess, injecting PYTHONPATH so the package
-        imports resolve no matter where `shiny run` sets the working directory.
-        """
-        env = os.environ.copy()
-
-        # Repo root is two levels up from .../oak_trade_agent/dynamic/shiny_dynamic.py
-        repo_root = Path(__file__).resolve().parents[2]
-        env["PYTHONPATH"] = str(repo_root) + (
-            os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else ""
-        )
-
         subprocess.run(
             ["shiny", "run", "--reload", str(Path(__file__).resolve())],
             check=False,

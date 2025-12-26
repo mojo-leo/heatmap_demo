@@ -26,12 +26,6 @@ from oak_trade_agent.data.baci_dataset import baci
 
 ###############################################################################
 class BokehServerHeatmap:
-    """
-    Pure Bokeh *embedded server* app:
-    - Run this file with `python .../bokeh_dynamic.py`
-    - Starts a Bokeh server programmatically (no `bokeh serve` command needed)
-    - Slider filters to Top-N countries
-    """
 
     title = "Exporter → Importer heatmap (filtered by Top-N total quantity)"
 
@@ -71,8 +65,6 @@ class BokehServerHeatmap:
             toolbar_location="right",
         )
 
-        # Axis labels and tick orientation
-        p.xaxis.axis_label = "Exporter country"
         p.yaxis.axis_label = "Importer country"
         p.xaxis.major_label_orientation = 3.14159 / 4  # 45 degrees
 
@@ -109,25 +101,15 @@ class BokehServerHeatmap:
         def on_slider_change(attr, old, new):
             df_new = self._filtered_df(int(new))
             source.data = ColumnDataSource.from_df(df_new)
-
             p.x_range.factors = sorted(df_new["exporter_name"].unique().tolist())
             p.y_range.factors = sorted(df_new["importer_name"].unique().tolist())
-
             mapper.low = float(df_new["quantity"].min())
             mapper.high = float(df_new["quantity"].max())
 
         slider.on_change("value", on_slider_change)
-
         doc.add_root(column(slider, p))
 
     def __call__(self, host: str = "127.0.0.1", port: int = 5006) -> None:
-        """
-        Start the Bokeh server programmatically and open a browser tab.
-        """
-        url = f"http://{host}:{port}/"
-        print(f"Starting Bokeh server at {url}")
-        print("Press Ctrl+C to stop.")
-
         server = Server(
             {"/": self.make_document},
             address=host,
@@ -136,12 +118,8 @@ class BokehServerHeatmap:
             num_procs=1,
         )
         server.start()
-
         server.io_loop.add_callback(server.show, "/")
-        try:
-            server.io_loop.start()
-        except KeyboardInterrupt:
-            pass
+        server.io_loop.start()
 
 
 ###############################################################################
@@ -151,3 +129,4 @@ bokeh_server_heatmap = BokehServerHeatmap()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     bokeh_server_heatmap()
+C
