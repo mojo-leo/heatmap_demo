@@ -61,22 +61,22 @@ Several approches can be used to generate an interactive animated heatmap.
 
 The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size.
 
-- [x] `oak_trade_agent.static.vega_static.py`
-- [x] `oak_trade_agent.static.holoviews_static.py`
-- [x] `oak_trade_agent.static.plotly_static.py`
-- [x] `oak_trade_agent.static.bokeh_static.py`
+- [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and inline js)
+- [x] `oak_trade_agent.static.vega_static.py` (with cdn)
+- [x] `oak_trade_agent.static.holoviews_static.py` (huge file + cdn)
+- [x] `oak_trade_agent.static.plotly_static.py` (huge file)
 
 ### 2) Dynamic in Python
 
 Another approach is to write all the code in python and have a dynamic webapp that serves the content to the browser. This server can also communicate with the browser and answer requests (such as filtering the dataframe) as the user interacts with the dashboard.
 
-- [ ] `oak_trade_agent.dynamic.voila_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.streamlit_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.shiny_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.holoviews_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.dash_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.d3blocks_heatmap.py`
-- [ ] `oak_trade_agent.dynamic.bokeh_heatmap.py`
+- [x] `oak_trade_agent.dynamic.voila_dynamic.py` (uses plotly)
+- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
+- [ ] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
+- [ ] `oak_trade_agent.dynamic.d3blocks_dynamic.py`
+- [ ] `oak_trade_agent.dynamic.bokeh_dynamic.py`
 
 Links:
 

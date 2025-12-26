@@ -106,9 +106,6 @@ class StreamlitHeatmap:
         st.caption(f"Showing {n} × {n} countries")
 
     def __call__(self) -> None:
-        """
-        Entry point for `streamlit run`.
-        """
         self.render()
 
 
