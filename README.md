@@ -71,10 +71,10 @@ The first idea is to write all the code in python while avoiding javascript and 
 Another approach is to write all the code in python and have a dynamic webapp that serves the content to the browser. This server can also communicate with the browser and answer requests (such as filtering the dataframe) as the user interacts with the dashboard.
 
 - [x] `oak_trade_agent.dynamic.voila_dynamic.py` (uses plotly)
-- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly)
+- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
 - [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
-- [ ] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
 - [ ] `oak_trade_agent.dynamic.d3blocks_dynamic.py`
 - [ ] `oak_trade_agent.dynamic.bokeh_dynamic.py`
 
