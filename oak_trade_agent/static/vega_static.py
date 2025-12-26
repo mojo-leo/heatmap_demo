@@ -26,8 +26,7 @@ class VegaHeatmap:
     @cached_property
     def heatmap(self) -> altair.Chart:
         # Calculate max_n from the dataframe ranks
-        df = baci.ranked_oak_df
-        max_n = int(max(df["exporter_rank"].max(), df["importer_rank"].max()))
+        max_n = len(baci.country_ranks)
         # Slider parameter for Top N countries to display
         top_n = altair.param(
             name="top_n",
