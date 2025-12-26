@@ -17,6 +17,7 @@ dependencies:
   - ipython
   - ipywidgets
   - anywidget
+  - fastapi
   - pip
   - pip:
     - py3-wget
