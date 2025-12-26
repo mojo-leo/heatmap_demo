@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This script starts up a simple FastAPI server that can be used to serve
+the dataframe to a browser in JSON format.
+"""
+
 # Third-party modules
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -16,8 +21,13 @@ app = FastAPI()
 df = baci.ranked_oak_df
 
 @app.get("/data")
-def data(top_n: int | None = None):
-    """Send the raw rows you need (or pre-aggregate if huge).
+def data():
+    """Send the all the raw rows you need (or pre-aggregate if huge)"""
+    return JSONResponse(df.to_dict(orient="records"))
+
+@app.get("/heatmap")
+def heatmap(top_n: int | None = None):
+    """Send only the filtered values you need (or pre-aggregate if huge).
     
     Parameters
     ----------

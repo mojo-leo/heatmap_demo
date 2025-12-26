@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-This object uses vega-lite to create a heatmap of the trade data.
-"""
 
 # Built-in modules
 import webbrowser
@@ -19,7 +16,10 @@ from oak_trade_agent.paths import get_output_dir
 
 ###############################################################################
 class VegaHeatmap:
-    """Creates a vega-lite heatmap visualization of trade data."""
+    """
+    This object uses vega-lite to create a heatmap of the trade data.
+    The result is a standalone HTML file that can be opened in a browser.
+    """
 
     title = "Exporter → Importer heatmap (filtered by Top-N total quantity)"
 

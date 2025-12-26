@@ -4,8 +4,11 @@
 
 ###############################################################################
 class MultiBaciDataset:
-    """Regroups several BACI datasets into a single object in order to have
-    a time series of trade data."""
+    """
+    #TODO
+    Regroups several BACI datasets into a single object in order to have
+    a time series of trade data.
+    """
 
     pass
 

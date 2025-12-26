@@ -32,7 +32,7 @@ Basically we end up with a dataframe that looks like this:
 | 2023   | 231        | 233        | 440791    | 6.376      | 1.225      | Ethiopia        | Estonia         | 138             | 40              |
 | 2023   | 218        | 372        | 440791    | 0.107      | 0.009      | Ecuador         | Ireland         | 149             | 47              |
 
-    from oak_trade_agent.baci_dataset import baci
+    from oak_trade_agent.data.baci_dataset import baci
     df = baci.ranked_oak_df
     preview = pandas.concat([df.head(), df.tail()])
     print(preview.to_markdown())
@@ -59,12 +59,12 @@ Several approches can be used to generate an interactive animated heatmap.
 
 ### Static in Python
 
-The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `plotly`, `holoviews`, `bokeh` to obtain a similar result, but these tests are not working properly.
+The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `plotly`, `holoviews` or even `bokeh` to obtain a similar result, but these tests have not been working very well.
 
-- [x] `oak_trade_agent.static.vega_heatmap.py`
-- [ ] `oak_trade_agent.static.holoviews_broken.py`
-- [ ] `oak_trade_agent.static.plotly_broken.py`
-- [-] `oak_trade_agent.static.bokeh_broken.py`
+- [x] `oak_trade_agent.static.vega_static.py`
+- [ ] `oak_trade_agent.static.holoviews_static.py`
+- [ ] `oak_trade_agent.static.plotly_static.py`
+- [x] `oak_trade_agent.static.bokeh_static.py`
 
 ### Dynamic in Python
 
@@ -77,6 +77,10 @@ Another approach is to write all the code in python and have a dynamic webapp th
 - [ ] `oak_trade_agent.dynamic.dash_heatmap.py`
 - [ ] `oak_trade_agent.dynamic.d3blocks_heatmap.py`
 - [ ] `oak_trade_agent.dynamic.bokeh_heatmap.py`
+
+Links:
+
+* https://hvplot.holoviz.org/en/docs/latest/index.html
 
 ### Static in Javascript
 

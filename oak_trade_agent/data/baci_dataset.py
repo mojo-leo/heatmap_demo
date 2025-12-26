@@ -19,6 +19,11 @@ from oak_trade_agent.paths import get_input_dir
 
 ###############################################################################
 class BaciDataset:
+    """
+    This class downloads the BACI dataset and provides a pandas dataframe with the
+    data. It also provides a method to get the country codes and a ranked dataframe
+    with the countries ranked by total quantity (exports + imports).
+    """
 
     url = "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS22_V202501.zip"
     csv_name = "BACI_HS22_Y2023_V202501.csv"
@@ -96,7 +101,7 @@ class BaciDataset:
                     return s
             return s
 
-        df = df.applymap(fix_mojibake)
+        df = df.map(fix_mojibake)
         # Replace some country names so they fit better in small graphs
         df.replace(
             {
