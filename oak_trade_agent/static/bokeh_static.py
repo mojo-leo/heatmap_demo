@@ -7,16 +7,20 @@ from functools import cached_property
 from bokeh.io import output_file, save
 from bokeh.layouts import column
 from bokeh.models import (
-    ColumnDataSource, CustomJS, Slider,
-    LinearColorMapper, ColorBar,
+    ColorBar,
+    ColumnDataSource,
+    CustomJS,
+    LinearColorMapper,
+    Slider,
 )
-from bokeh.plotting import figure
 from bokeh.palettes import Viridis256
+from bokeh.plotting import figure
 
 from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
 
 
+###############################################################################
 class BokehHeatmapResize:
     """
     This object uses an offline-mode of bokeh to create a heatmap of the
@@ -31,7 +35,7 @@ class BokehHeatmapResize:
         df = baci.ranked_oak_df.copy()
 
         # Max N from ranks
-        max_n = int(max(df["exporter_rank"].max(), df["importer_rank"].max()))
+        max_n = len(baci.country_ranks)
         initial_n = min(10, max_n)
 
         # Build ordered lists of countries by rank (very important)
@@ -84,10 +88,14 @@ class BokehHeatmapResize:
             fill_color={"field": "quantity", "transform": color_mapper},
         )
 
-        p.add_layout(ColorBar(color_mapper=color_mapper, title="Quantity (tons)"), "right")
+        p.add_layout(
+            ColorBar(color_mapper=color_mapper, title="Quantity (tons)"), "right"
+        )
         p.xaxis.major_label_orientation = 1.0
 
-        slider = Slider(start=2, end=max_n, value=initial_n, step=1, title="Top # countries")
+        slider = Slider(
+            start=2, end=max_n, value=initial_n, step=1, title="Top # countries"
+        )
 
         slider.js_on_change(
             "value",
@@ -130,8 +138,8 @@ class BokehHeatmapResize:
 
                 source_view.data = new_data;
                 source_view.change.emit();
-                """
-            )
+                """,
+            ),
         )
 
         return column(slider, p)
