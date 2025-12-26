@@ -19,10 +19,11 @@ from oak_trade_agent.paths import get_output_dir
 class PlotlyHeatmapOffline:
     """
     Standalone Plotly HTML heatmap with a Top-N slider (no server).
-    This is “offline” in the sense of no server, but it precomputes every N.
+    This is "offline" in the sense of no server, but it precomputes every N.
     If max_n is large, the HTML can get big.
     To reduce size, change the loop to only generate a subset
     (e.g., steps of 1 up to 30, then steps of 5/10), or cap max_n.
+    Resulting HTML file size is: 12.2 MB
     """
 
     title = "Exporter → Importer heatmap (resize by Top-N countries)"

@@ -26,6 +26,7 @@ class BokehHeatmapResize:
     This object uses an offline-mode of bokeh to create a heatmap of the
     trade data. To do this we use a CustomJS Top-N slider. So there actually
     is a bit of javascript in this class.
+    Resulting HTML file size is: 80 KB
     """
 
     title = "Exporter → Importer heatmap (resize by Top-N countries)"
@@ -147,15 +148,14 @@ class BokehHeatmapResize:
     def __call__(self) -> None:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
-
-        output_path = output_dir / "bokeh_heatmap_resize_topn.html"
+        output_path = output_dir / "bokeh_static.html"
         output_file(output_path, title=self.title)
         save(self.layout)
-
         print(f"Saved {output_path} — open it in your browser.")
         webbrowser.open(f"file://{output_path.absolute()}")
 
 
+###############################################################################
 bokeh_heatmap_resize = BokehHeatmapResize()
 
 if __name__ == "__main__":

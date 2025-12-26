@@ -19,6 +19,7 @@ class VegaHeatmap:
     """
     This object uses vega-lite to create a heatmap of the trade data.
     The result is a standalone HTML file that can be opened in a browser.
+    Resulting HTML file size is: 307 KB
     """
 
     title = "Exporter → Importer heatmap (filtered by Top-N total quantity)"
