@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>D3.js Heatmap</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #controls {
+      margin-bottom: 20px;
+    }
+    #chart {
+      width: 1000px;
+      height: 850px;
+    }
+    .cell {
+      stroke: #fff;
+      stroke-width: 1px;
+    }
+    .cell:hover {
+      stroke: #000;
+      stroke-width: 2px;
+    }
+    .axis {
+      font-size: 12px;
+    }
+    .axis-label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .legend {
+      font-size: 11px;
+    }
+    .tooltip {
+      position: absolute;
+      text-align: left;
+      padding: 8px;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: 4px;
+      pointer-events: none;
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label>Top N: <input id="topn" type="range" min="2" max="50" value="10"></label>
+    <span id="topnLabel">10</span>
+  </div>
+  <div id="chart"></div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const margin = { top: 100, right: 150, bottom: 120, left: 120 };
+    const width = 1000 - margin.left - margin.right;
+    const height = 850 - margin.top - margin.bottom;
+
+    let rows = [];
+    let countries = [];     // global sorted order
+    let mat = null;         // full NxN matrix
+
+    const svg = d3.select("#chart")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom);
+
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const tooltip = d3.select("#tooltip");
+
+    function buildFullMatrix(rows) {
+      // compute totals for sorting
+      const expTot = new Map(), impTot = new Map();
+      for (const r of rows) {
+        expTot.set(r.exporter_name, (expTot.get(r.exporter_name) || 0) + r.quantity);
+        impTot.set(r.importer_name, (impTot.get(r.importer_name) || 0) + r.quantity);
+      }
+      const all = new Set([...expTot.keys(), ...impTot.keys()]);
+      countries = [...all].sort((a, b) => {
+        const ta = (expTot.get(a) || 0) + (impTot.get(a) || 0);
+        const tb = (expTot.get(b) || 0) + (impTot.get(b) || 0);
+        return tb - ta;
+      });
+
+      const idx = new Map(countries.map((c, i) => [c, i]));
+      const n = countries.length;
+
+      // dense matrix
+      mat = Array.from({length: n}, () => Array(n).fill(0));
+
+      for (const r of rows) {
+        const i = idx.get(r.importer_name);
+        const j = idx.get(r.exporter_name);
+        if (i != null && j != null) mat[i][j] += r.quantity;
+      }
+
+      // set slider max to available
+      const slider = document.getElementById('topn');
+      slider.max = String(Math.max(2, n));
+      if (Number(slider.value) > n) slider.value = String(Math.min(10, n));
+    }
+
+    function renderTopN(topN) {
+      const n = Math.max(2, Math.min(topN, countries.length));
+      const x = countries.slice(0, n);
+      const y = countries.slice(0, n);
+
+      // Clear previous content
+      g.selectAll("*").remove();
+
+      // Create scales
+      const xScale = d3.scaleBand()
+        .domain(x)
+        .range([0, width])
+        .padding(0.05);
+
+      const yScale = d3.scaleBand()
+        .domain(y)
+        .range([0, height])
+        .padding(0.05);
+
+      // Get min and max values for color scale
+      let minVal = Infinity;
+      let maxVal = -Infinity;
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          const v = mat[i][j];
+          if (v > 0) {
+            minVal = Math.min(minVal, v);
+            maxVal = Math.max(maxVal, v);
+          }
+        }
+      }
+      if (minVal === Infinity) minVal = 0;
+      if (maxVal === -Infinity) maxVal = 1;
+
+      // Color scale
+      const colorScale = d3.scaleSequential(d3.interpolateViridis)
+        .domain([minVal, maxVal]);
+
+      // Create cells
+      const cells = g.selectAll(".cell")
+        .data(d3.range(n * n))
+        .enter()
+        .append("rect")
+        .attr("class", "cell")
+        .attr("x", (d) => {
+          const j = d % n;
+          return xScale(x[j]);
+        })
+        .attr("y", (d) => {
+          const i = Math.floor(d / n);
+          return yScale(y[i]);
+        })
+        .attr("width", xScale.bandwidth())
+        .attr("height", yScale.bandwidth())
+        .attr("fill", (d) => {
+          const i = Math.floor(d / n);
+          const j = d % n;
+          return colorScale(mat[i][j]);
+        })
+        .on("mouseover", function(event, d) {
+          const i = Math.floor(d / n);
+          const j = d % n;
+          const exporter = x[j];
+          const importer = y[i];
+          const val = mat[i][j];
+          
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 1);
+          tooltip.html(
+            `<b>Exporter:</b> ${exporter}<br>` +
+            `<b>Importer:</b> ${importer}<br>` +
+            `<b>Quantity:</b> ${val.toLocaleString()} tons`
+          )
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 10) + "px");
+        })
+        .on("mouseout", function() {
+          tooltip.transition()
+            .duration(200)
+            .style("opacity", 0);
+        });
+
+      // Add x-axis
+      const xAxis = d3.axisBottom(xScale)
+        .tickSize(0);
+      g.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+
+      // Add y-axis
+      const yAxis = d3.axisLeft(yScale)
+        .tickSize(0);
+      g.append("g")
+        .attr("class", "axis")
+        .call(yAxis);
+
+      // Add axis labels
+      g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", `translate(${width / 2}, ${height + 80})`)
+        .style("text-anchor", "middle")
+        .text("Exporter country");
+
+      g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -80)
+        .attr("x", -height / 2)
+        .style("text-anchor", "middle")
+        .text("Importer country");
+
+      // Add title
+      g.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", `translate(${width / 2}, -50)`)
+        .style("text-anchor", "middle")
+        .text(`Exporter → Importer heatmap (Top ${n})`);
+
+      // Add color legend
+      const legendWidth = 20;
+      const legendHeight = 200;
+      const legendX = width + 20;
+      const legendY = (height - legendHeight) / 2;
+
+      const legendScale = d3.scaleLinear()
+        .domain([minVal, maxVal])
+        .range([legendHeight, 0]);
+
+      const legendAxis = d3.axisRight(legendScale)
+        .ticks(5)
+        .tickFormat(d3.format(".2s"));
+
+      const legend = g.append("g")
+        .attr("transform", `translate(${legendX}, ${legendY})`);
+
+      const defs = svg.append("defs");
+      const linearGradient = defs.append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%")
+        .attr("x2", "0%")
+        .attr("y1", "0%")
+        .attr("y2", "100%");
+
+      const numStops = 10;
+      for (let i = 0; i <= numStops; i++) {
+        const offset = (i / numStops) * 100;
+        const value = minVal + (maxVal - minVal) * (1 - i / numStops);
+        linearGradient.append("stop")
+          .attr("offset", `${offset}%`)
+          .attr("stop-color", colorScale(value));
+      }
+
+      legend.append("rect")
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)");
+
+      legend.append("g")
+        .attr("class", "legend")
+        .attr("transform", `translate(${legendWidth}, 0)`)
+        .call(legendAxis);
+
+      legend.append("text")
+        .attr("class", "axis-label")
+        .attr("transform", `translate(${legendWidth / 2}, ${legendHeight + 20})`)
+        .style("text-anchor", "middle")
+        .text("Quantity (tons)");
+    }
+
+    async function main() {
+      const resp = await fetch('/data');
+      rows = await resp.json();
+
+      // ensure quantity is number
+      rows = rows.map(r => ({...r, quantity: Number(r.quantity)}));
+
+      buildFullMatrix(rows);
+
+      const slider = document.getElementById('topn');
+      const label = document.getElementById('topnLabel');
+
+      function update() {
+        const n = Number(slider.value);
+        label.textContent = n;
+        renderTopN(n);
+      }
+
+      slider.addEventListener('input', update);
+      update();
+    }
+
+    main();
+  </script>
+</body>
+</html>
+
