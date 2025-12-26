@@ -61,10 +61,10 @@ Several approches can be used to generate an interactive animated heatmap.
 
 The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size.
 
-- [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and inline js)
 - [x] `oak_trade_agent.static.vega_static.py` (with cdn)
-- [x] `oak_trade_agent.static.holoviews_static.py` (huge file + cdn)
-- [x] `oak_trade_agent.static.plotly_static.py` (huge file)
+- [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and a bit of js)
+- [x] `oak_trade_agent.static.holoviews_static.py` (huge file and cdn)
+- [x] `oak_trade_agent.static.plotly_static.py` (huge file no cdn)
 
 ### 2) Dynamic in Python
 
@@ -77,6 +77,18 @@ Another approach is to write all the code in python and have a dynamic webapp th
 - [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
 - [ ] `oak_trade_agent.dynamic.d3blocks_dynamic.py`
 - [ ] `oak_trade_agent.dynamic.bokeh_dynamic.py`
+
+Summary:
+
+| Framework | How the server works |
+|---------|---------------------------------------------|
+| **Voilà** | Jupyter kernel, ipywidgets protocol, notebook-oriented execution |
+| **Streamlit** | Script rerun abstraction; widget state drives full re-execution |
+| **Shiny** | Reactive dependency graph; fine-grained invalidation of computations |
+| **Panel** | High-level layouts, widgets, and app composition on top of Bokeh server |
+| **HoloViews** | Declarative plotting; automatic aggregation and gridding of tidy data |
+| **Dash** | Explicit callback DAG; React-based frontend; Plotly JSON serialization |
+| **Bokeh server** | Minimal primitives only: data sources, callbacks, and WebSocket patches |
 
 Links:
 
