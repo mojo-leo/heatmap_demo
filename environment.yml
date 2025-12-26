@@ -4,6 +4,9 @@ channels:
   - defaults
 dependencies:
   - pandas
+  - scipy
+  - scikit-learn
+  - seaborn
   - tabulate
   - fsspec
   - rich
@@ -14,6 +17,7 @@ dependencies:
   - streamlit
   - shiny
   - shinywidgets
+  - nicegui
   - holoviews
   - panel
   - ipython
@@ -21,6 +25,9 @@ dependencies:
   - anywidget
   - fastapi
   - voila
+  - d3blocks
   - pip
   - pip:
     - py3-wget
+    - d3blocks
+    - clusteval

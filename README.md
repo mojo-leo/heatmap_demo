@@ -59,12 +59,13 @@ Several approches can be used to generate an interactive animated heatmap.
 
 ### 1) Static in Python
 
-The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size.
+The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size. Honorable mention for `d3blocks` also though it doesn't provide a slider.
 
 - [x] `oak_trade_agent.static.vega_static.py` (with cdn)
 - [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and a bit of js)
 - [x] `oak_trade_agent.static.holoviews_static.py` (huge file and cdn)
 - [x] `oak_trade_agent.static.plotly_static.py` (huge file no cdn)
+- [ ] `oak_trade_agent.static.d3blocks_static.py` (no slider)
 
 ### 2) Dynamic in Python
 
@@ -73,14 +74,14 @@ Another approach is to write all the code in python and have a dynamic webapp th
 - [x] `oak_trade_agent.dynamic.voila_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent.dynamic.nicegui_dynamic.py` (uses plotly)
 - [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
 - [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
-- [ ] `oak_trade_agent.dynamic.bokeh_dynamic.py` (uses bokeh)
-- [ ] `oak_trade_agent.dynamic.d3blocks_dynamic.py` 
+- [x] `oak_trade_agent.dynamic.bokeh_dynamic.py` (uses bokeh)
 
 Summary:
 
-| Framework | How the server works |
+| Framework | How the tech works |
 |---------|---------------------------------------------|
 | **Voilà** | Jupyter kernel, ipywidgets protocol, notebook-oriented execution |
 | **Streamlit** | Script rerun abstraction; widget state drives full re-execution |
@@ -88,11 +89,8 @@ Summary:
 | **Panel** | High-level layouts, widgets, and app composition on top of Bokeh server |
 | **HoloViews** | Declarative plotting; automatic aggregation and gridding of tidy data |
 | **Dash** | Explicit callback DAG; React-based frontend; Plotly JSON serialization |
+| **NiceGUI** | Python-first web UI framework; Vue.js frontend, event-driven callbacks over WebSockets |
 | **Bokeh server** | Minimal primitives only: data sources, callbacks, and WebSocket patches |
-
-Links:
-
-* https://hvplot.holoviz.org/en/docs/latest/index.html
 
 ### 3) Static in Javascript
 
