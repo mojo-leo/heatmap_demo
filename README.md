@@ -59,12 +59,12 @@ Several approches can be used to generate an interactive animated heatmap.
 
 ### Static in Python
 
-The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `plotly`, `holoviews`, `bokeh` to obtain a similar result, but these tests are not working.
+The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `plotly`, `holoviews`, `bokeh` to obtain a similar result, but these tests are not working properly.
 
-- [x] `oak_trade_agent.static.vega_heatmap`
-- [ ] `oak_trade_agent.static.holoviews_broken`
-- [ ] `oak_trade_agent.static.plotly_broken`
-- [ ] `oak_trade_agent.static.bokeh_broken`
+- [x] `oak_trade_agent.static.vega_heatmap.py`
+- [ ] `oak_trade_agent.static.holoviews_broken.py`
+- [ ] `oak_trade_agent.static.plotly_broken.py`
+- [-] `oak_trade_agent.static.bokeh_broken.py`
 
 ### Dynamic in Python
 
