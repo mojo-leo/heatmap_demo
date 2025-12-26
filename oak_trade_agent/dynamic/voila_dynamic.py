@@ -6,7 +6,6 @@
 import json
 import os
 import subprocess
-import webbrowser
 from functools import cached_property
 
 # Third-party modules
@@ -163,7 +162,6 @@ class VoilaHeatmap:
                     "execution_count": None,
                     "outputs": [],
                     "source": [
-                        "import sys; print(sys.path)\n",
                         f"{self.NOTEBOOK_IMPORT}\n",
                         "voila_heatmap.show()\n",
                     ],
@@ -183,11 +181,12 @@ class VoilaHeatmap:
 
         nb_path.write_text(json.dumps(nb, indent=2), encoding="utf-8")
         print(f"Wrote Voilà notebook: {nb_path}")
+
         env = os.environ.copy()
         env["PYTHONPATH"] = str(get_output_dir().parent)
 
         subprocess.run(
-            ["voila", str(nb_path), "--strip_sources=True"],
+            ["voila", str(nb_path), "--strip_sources=True", "--theme=auto"],
             check=False,
             env=env,
         )
