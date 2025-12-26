@@ -17,6 +17,7 @@ from oak_trade_agent.data.baci_dataset import baci
 
 # Set the backend for HoloViews
 hv.extension("bokeh")
+pn.extension()
 
 
 ###############################################################################
@@ -30,7 +31,7 @@ class HoloviewsServerHeatmap:
         """Create the holoviews heatmap visualization with interactive slider."""
         # Calculate max_n from the dataframe ranks
         df = baci.ranked_oak_df
-        max_n = int(max(df["exporter_rank"].max(), df["importer_rank"].max()))
+        max_n = len(baci.country_ranks)
         default_top_n = min(10, max_n)
 
         # Create a function that generates the heatmap based on top_n
@@ -76,18 +77,14 @@ class HoloviewsServerHeatmap:
         dmap = pn.bind(create_heatmap, top_n=top_n_slider)
 
         # Combine the slider and heatmap in a Panel layout
-        panel_layout = pn.Column(top_n_slider, dmap)
-        return panel_layout
+        return pn.Column(top_n_slider, dmap)
 
     @cached_property
     def app(self) -> pn.Column:
-        """Return the Panel app (alias for heatmap to match vega_heatmap structure)."""
         return self.heatmap
 
-    def __call__(self, port: int = 5006, host: str = "127.0.0.1") -> None:
+    def __call__(self, port: int = 5006, host: str = "localhost") -> None:
         """Run the HoloViews server using Panel."""
-        print(f"Starting HoloViews server on http://{host}:{port}")
-        print("Press Ctrl+C to stop the server.")
         self.app.show(port=port, address=host)
 
 
@@ -98,4 +95,3 @@ holoviews_server_heatmap = HoloviewsServerHeatmap()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     holoviews_server_heatmap()
-
