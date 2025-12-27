@@ -1,8 +1,8 @@
-# `oak_trade_agent` version 0.1.0
+# `oak_trade_agent` version 0.2.0
 
-`oak_trade_agent` is a python package to helps answer questions on oak trade statistics based on bilateral Comtrade data. In the starting phase it will provide only a simple visualization of sample data based on oak roundwood and sawnwood (reference number 440791)
+`oak_trade_agent` is a python package to help answer questions on oak trade statistics based on bilateral Comtrade data. In the starting phase it will provide only a simple visualization of sample data based on oak roundwood and sawnwood (reference number 440791)
 
-Our first objective is simply to compare browser-based plotting methods by generating a heatmap. For this we explore several different strategies, and multiple technologies.
+Our first objective is simply to compare browser-based plotting methods by generating a heatmap. For this, we explore several different strategies and multiple technologies.
 
 <p align="center">
 <img height="128" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood">
@@ -12,7 +12,7 @@ Our first objective is simply to compare browser-based plotting methods by gener
 ## Input data
 
 Based on a downloadable zip file with information on trade data from BACI.
-The acronym  BACI stands for: "Base Pour L’Analyse Du Commerce International".
+The acronym BACI stands for: "Base Pour L’Analyse Du Commerce International".
 
 Details of the dataset here:
 
@@ -39,7 +39,7 @@ Basically we end up with a dataframe that looks like this:
 
 ## Output graph
 
-A heatmap that is interactive and can be seen in the browser. We want the interface to have a slider that goes from 1 to N, and changes the number of countries that are displayed on the heatmap. Here is a example:
+A heatmap that is interactive and can be seen in the browser. We want the interface to have a slider that goes from 1 to N, and changes the number of countries that are displayed on the heatmap. Here is an example:
 
 <p align="center">
 <img src="docs/vega_screenshot.png?raw=true" alt="Logo showing a stack of wood">
@@ -55,13 +55,13 @@ And it will populate the `output/` directory in which you will find an HTML file
 
 ## Technologies
 
-Several approches can be used to generate an interactive animated heatmap. See:
+Several approaches can be used to generate an interactive animated heatmap. See:
 
 https://github.com/hal9ai/awesome-dataviz
 
 ### 1) Static in Python
 
-The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size. Honorable mention for `d3blocks` also though it doesn't provide a slider.
+The first idea is to write all the code in python while avoiding JavaScript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size. Honorable mention for `d3blocks` also though it doesn't provide a slider.
 
 - [x] `oak_trade_agent/static/vega_static.py` (with cdn)
 - [x] `oak_trade_agent/static/bokeh_static.py` (with cdn and a bit of js)
@@ -99,7 +99,7 @@ Summary:
 
 ### 3) Static in Javascript
 
-The third approach is to depart from python, and create a single HTML file that imbeds the dataframe as well as the necessary javascript to perform all interactive operations on the client side.
+The third approach is to depart from python, and create a single HTML file that embeds the dataframe as well as the necessary JavaScript to perform all interactive operations on the client side.
 
 - [x] `oak_trade_agent/with_js/d3_static.py`
 - [x] `oak_trade_agent/with_js/echarts.py`
@@ -111,7 +111,7 @@ The third approach is to depart from python, and create a single HTML file that 
 
 ### 4) Dynamic in Javascript
 
-The fourth approach is to start a simple RESTful python app that serves the dataframe as JSON HTTP to any client browser that requests it. All the libraries used above can qualify for this of course. But we have not used this solution as the test dataset is sufficently small to fit inside the static HTML. A simple server that takes `top_n` as parameter can be found here:
+The fourth approach is to start a simple RESTful python app that serves the dataframe as JSON HTTP to any client browser that requests it. All the libraries used above can qualify for this of course. But we have not used this solution as the test dataset is sufficiently small to fit inside the static HTML. A simple server that takes `top_n` as parameter can be found here:
 
 - [x] `oak_trade_agent/data/server.py`
 
@@ -125,8 +125,8 @@ See this page that is using Panel running on Pyodide (WebAssembly):
 
 Or see "JupyterLite" where notebooks open and run without a backend kernel (also uses Pyodide under the hood)
 
-- [] `oak_trade_agent/with_wasm/`
+- [x] `oak_trade_agent/with_wasm/`
 
 You just need to serve this directory statically and point your browser to it:
 
-$ python -m http.server
+    $ python -m http.server
