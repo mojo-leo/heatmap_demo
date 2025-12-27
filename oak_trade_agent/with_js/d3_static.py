@@ -7,11 +7,6 @@ from oak_trade_agent.with_js.template import TemplateHTML
 
 ###############################################################################
 class D3Static(TemplateHTML):
-    """
-    A class that embeds BACI JSON data into a D3 HTML template by replacing the
-    `__EMBEDDED_DATA__` placeholder.
-    """
-
     template_name = "d3_static.html"
 
 

@@ -17,7 +17,9 @@ class TemplateHTML:
     `__EMBEDDED_DATA__` placeholder.
     """
 
-    template_name: str = ""
+    @property
+    def template_name(self) -> NotImplementedError:
+        raise NotImplementedError("Subclasses must implement this method")
 
     @property
     def body(self) -> str:
@@ -31,4 +33,3 @@ class TemplateHTML:
         print(f"Saved {output_path} — open it in your browser.")
         webbrowser.open(f"file://{output_path.absolute()}")
         return output_path
-
