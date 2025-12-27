@@ -8,7 +8,7 @@
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:16px}
     .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-    #chart{width:900px;max-width:100%;height:820px}
+    #chart{width:900px;max-width:100%;height:820px;padding-right:80px;box-sizing:content-box}
     .hint{color:#666;font-size:12px}
   </style>
 </head>
@@ -75,12 +75,13 @@
     tooltip: { formatter: (v) => (Number.isFinite(v) ? v.toLocaleString(undefined,{maximumFractionDigits:3}) : String(v)) },
     legend: {
       visible: true,
-      align: 'right'
+      align: 'left'
     },
     series: {
       selectable: false,
       colorScale: {
-        minColor: '#f7fbff',
+        min: 0,
+        minColor: '#ffffff',
         maxColor: '#08306b'
       }
     },
