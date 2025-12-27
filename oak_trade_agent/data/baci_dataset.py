@@ -112,6 +112,7 @@ class BaciDataset:
                 "Rep. of Korea": "Korea",
                 "Rep. of Moldova": "Moldova",
                 "United Arab Emirates": "UAE",
+                "United Kingdom": "UK",
             },
             inplace=True,
         )
