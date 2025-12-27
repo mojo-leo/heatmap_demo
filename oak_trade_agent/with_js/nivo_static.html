@@ -93,10 +93,20 @@
           data,
           margin: { top: 110, right: 60, bottom: 110, left: 140 },
           valueFormat: ">-.3s",
-          axisTop: { tickRotation: -45 },
+          axisTop: {
+            tickRotation: -45,
+            legend: "Exporter country",
+            legendPosition: "middle",
+            legendOffset: -90
+          },
           axisRight: null,
           axisBottom: null,
-          axisLeft: { tickRotation: 0 },
+          axisLeft: {
+            tickRotation: 0,
+            legend: "Importer country",
+            legendPosition: "middle",
+            legendOffset: -110
+          },
           colors: { type: "sequential", scheme: "viridis" },
           emptyColor: "#fff",
           borderWidth: 0,
