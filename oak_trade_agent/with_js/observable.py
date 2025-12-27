@@ -17,7 +17,7 @@ class ObservablePlot:
     `__EMBEDDED_DATA__` placeholder.
     """
 
-    template_name = "observable_plot.html"
+    template_name = "observable.html"
 
     @property
     def body(self) -> str:
@@ -37,4 +37,3 @@ class ObservablePlot:
 observable_plot = ObservablePlot()
 if __name__ == "__main__":
     observable_plot()
-
