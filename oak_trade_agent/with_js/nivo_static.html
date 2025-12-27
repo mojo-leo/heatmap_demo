@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nivo heatmap (Top-N)</title>
+  <style>
+    body{font-family:system-ui,sans-serif;margin:16px}
+    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    #chart{margin-top:10px;height:900px;border:1px solid #ddd}
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom": "https://esm.sh/react-dom@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "react/jsx-runtime": "https://esm.sh/react@18.2.0/jsx-runtime",
+        "react/jsx-dev-runtime": "https://esm.sh/react@18.2.0/jsx-dev-runtime"
+      }
+    }
+  </script>
+</head>
+<body>
+  <h2>Exporter → Importer heatmap (Top-N by total quantity)</h2>
+  <div class="controls">
+    <label>Top N</label>
+    <input id="n" type="range" min="2" max="10" step="1" value="10" />
+    <span id="nv">10</span>
+  </div>
+  <div id="chart"></div>
+
+  <script type="module">
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    // IMPORTANT: externalize react/react-dom so Nivo uses the same React instance
+    import { ResponsiveHeatMapCanvas } from "https://esm.sh/@nivo/heatmap@0.99.0?external=react,react-dom";
+
+    // Template variable: pandas to_json(..., orient="records") array
+    const RECORDS = __EMBEDDED_DATA__;
+    if (!Array.isArray(RECORDS)) throw new Error("RECORDS must be a JSON array");
+
+    function countryOrder(records){
+      const totals = new Map();
+      for (const r of records){
+        const e = r.exporter_name, i = r.importer_name, q = +r.quantity;
+        if (!e || !i || !Number.isFinite(q)) continue;
+        totals.set(e, (totals.get(e)||0) + q);
+        totals.set(i, (totals.get(i)||0) + q);
+      }
+      return Array.from(totals.entries()).sort((a,b)=>b[1]-a[1]).map(d=>d[0]);
+    }
+
+    function buildMatrix(records, countries){
+      const idx = new Map(countries.map((c,i)=>[c,i]));
+      const n = countries.length;
+      const z = Array.from({length:n}, ()=>Array(n).fill(0));
+      for (const r of records){
+        const e = r.exporter_name, i = r.importer_name, q = +r.quantity;
+        if (!idx.has(e) || !idx.has(i) || !Number.isFinite(q)) continue;
+        z[idx.get(i)][idx.get(e)] += q;
+      }
+      return z;
+    }
+
+    // Nivo heatmap expects: [{ id: rowLabel, data: [{ x: colLabel, y: value }, ...] }, ...]
+    function toNivoData(countries, Z, n){
+      const names = countries.slice(0, n);
+      return names.map((rowName, yi) => ({
+        id: rowName,
+        data: names.map((colName, xi) => ({ x: colName, y: Z[yi][xi] })),
+      }));
+    }
+
+    const countries = countryOrder(RECORDS);
+    const Z = buildMatrix(RECORDS, countries);
+
+    const slider = document.getElementById("n");
+    const label = document.getElementById("nv");
+    slider.min = 2;
+    slider.max = Math.max(2, countries.length);
+    slider.value = String(Math.min(10, countries.length));
+
+    const root = createRoot(document.getElementById("chart"));
+
+    function render(){
+      const n = parseInt(slider.value, 10);
+      label.textContent = String(n);
+      const data = toNivoData(countries, Z, n);
+
+      root.render(
+        React.createElement(ResponsiveHeatMapCanvas, {
+          data,
+          margin: { top: 110, right: 60, bottom: 110, left: 140 },
+          valueFormat: ">-.3s",
+          axisTop: { tickRotation: -45 },
+          axisRight: null,
+          axisBottom: null,
+          axisLeft: { tickRotation: 0 },
+          colors: { type: "sequential", scheme: "viridis" },
+          emptyColor: "#fff",
+          borderWidth: 0,
+          enableLabels: false,
+        })
+      );
+    }
+
+    slider.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>

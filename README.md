@@ -55,7 +55,9 @@ And it will populate the `output/` directory in which you will find an HTML file
 
 ## Technologies
 
-Several approches can be used to generate an interactive animated heatmap.
+Several approches can be used to generate an interactive animated heatmap. See:
+
+https://github.com/hal9ai/awesome-dataviz
 
 ### 1) Static in Python
 
@@ -102,7 +104,9 @@ The third approach is to depart from python, and create a single HTML file that 
 - [x] `oak_trade_agent.with_js.d3_static.py`
 - [x] `oak_trade_agent.with_js.echarts.py`
 - [x] `oak_trade_agent.with_js.observable.py`
-- [ ] `oak_trade_agent.with_js.chartjs.py`
+- [x] `oak_trade_agent.with_js.chartjs.py`
+- [x] `oak_trade_agent.with_js.nivo_static.py`
+- [ ] `oak_trade_agent.with_js.visx_static.py`
 
 ### 4) Dynamic in Javascript
 
