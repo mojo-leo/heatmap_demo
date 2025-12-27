@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chart.js heatmap (Top-N)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    body{font-family:system-ui,sans-serif;margin:16px}
+    .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    #chart{margin-top:10px;width:100%;height:900px;border:1px solid #ddd;position:relative}
+    .tooltip{position:fixed;pointer-events:none;display:none;background:rgba(0,0,0,.85);color:#fff;padding:6px 8px;border-radius:6px;font-size:12px;z-index:1000}
+  </style>
+</head>
+<body>
+  <h2>Exporter → Importer heatmap (Top-N by total quantity)</h2>
+  <div class="controls">
+    <label>Top N</label>
+    <input id="n" type="range" min="2" max="10" step="1" value="10" />
+    <span id="nv">10</span>
+  </div>
+  <div id="chart"><canvas id="canvas"></canvas></div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    // Template variable: pandas to_json(..., orient="records") array
+    const RECORDS = __EMBEDDED_DATA__;
+
+    function countryOrder(records){
+      const totals = new Map();
+      for(const r of records){
+        const e = r.exporter_name, i = r.importer_name, q = +r.quantity;
+        if(!e || !i || !Number.isFinite(q)) continue;
+        totals.set(e, (totals.get(e)||0) + q);
+        totals.set(i, (totals.get(i)||0) + q);
+      }
+      return Array.from(totals.entries()).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+    }
+
+    function buildMatrix(records, countries){
+      const idx = new Map(countries.map((c,i)=>[c,i]));
+      const n = countries.length;
+      const z = Array.from({length:n}, ()=>Array(n).fill(0));
+      for(const r of records){
+        const e = r.exporter_name, i = r.importer_name, q = +r.quantity;
+        if(!idx.has(e) || !idx.has(i) || !Number.isFinite(q)) continue;
+        z[idx.get(i)][idx.get(e)] += q;
+      }
+      return z;
+    }
+
+    function viridisColor(normalized){
+      // Viridis color scale approximation
+      const r = Math.floor(68 + normalized * 187);
+      const g = Math.floor(1 + normalized * 253);
+      const b = Math.floor(84 + normalized * 171);
+      return `rgb(${r},${g},${b})`;
+    }
+
+    const countries = countryOrder(RECORDS);
+    const Z = buildMatrix(RECORDS, countries);
+
+    const canvas = document.getElementById("canvas");
+    const slider = document.getElementById("n");
+    const label = document.getElementById("nv");
+    const tooltip = document.getElementById("tooltip");
+    const chartDiv = document.getElementById("chart");
+
+    slider.min = 2;
+    slider.max = Math.max(2, countries.length);
+    slider.value = String(Math.min(10, countries.length));
+
+    let chart = null;
+
+    function render(){
+      const n = parseInt(slider.value, 10);
+      label.textContent = String(n);
+
+      const names = countries.slice(0, n);
+      const zSub = Z.slice(0, n).map(row => row.slice(0, n));
+      
+      let maxv = 0;
+      for(const row of zSub) for(const v of row) if(v > maxv) maxv = v;
+
+      // Prepare data for Chart.js scatter plot (we'll use it as heatmap)
+      const data = [];
+      for(let y=0; y<n; y++){
+        for(let x=0; x<n; x++){
+          data.push({
+            x: x,
+            y: y,
+            v: zSub[y][x],
+            exporter: names[x],
+            importer: names[y]
+          });
+        }
+      }
+
+      if(chart) chart.destroy();
+
+      const ctx = canvas.getContext('2d');
+      const width = chartDiv.clientWidth - 40;
+      const height = 900;
+      canvas.width = width;
+      canvas.height = height;
+
+      const margin = {top: 120, right: 100, bottom: 80, left: 120};
+      const cellWidth = (width - margin.left - margin.right) / n;
+      const cellHeight = (height - margin.top - margin.bottom) / n;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw cells
+      for(const d of data){
+        const x = margin.left + d.x * cellWidth;
+        const y = margin.top + d.y * cellHeight;
+        const normalized = Math.sqrt(d.v / (maxv || 1));
+        ctx.fillStyle = viridisColor(normalized);
+        ctx.fillRect(x, y, cellWidth - 1, cellHeight - 1);
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, cellWidth - 1, cellHeight - 1);
+      }
+
+      // Draw labels
+      ctx.fillStyle = '#000';
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // X-axis labels (top)
+      for(let i=0; i<n; i++){
+        const x = margin.left + i * cellWidth + cellWidth / 2;
+        const y = margin.top - 20;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(-Math.PI / 4);
+        ctx.textAlign = 'right';
+        ctx.fillText(names[i], 0, 0);
+        ctx.restore();
+      }
+
+      // Y-axis labels (left)
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for(let i=0; i<n; i++){
+        const x = margin.left - 10;
+        const y = margin.top + i * cellHeight + cellHeight / 2;
+        ctx.fillText(names[i], x, y);
+      }
+
+      // Axis titles
+      ctx.textAlign = 'center';
+      ctx.font = '14px system-ui, sans-serif';
+      ctx.fillText('Exporter country', width / 2, margin.top - 60);
+      ctx.save();
+      ctx.translate(30, height / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText('Importer country', 0, 0);
+      ctx.restore();
+
+      // Add mouse interaction
+      canvas.onmousemove = function(e){
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        if(x < margin.left || x > width - margin.right || 
+           y < margin.top || y > height - margin.bottom){
+          tooltip.style.display = 'none';
+          return;
+        }
+
+        const col = Math.floor((x - margin.left) / cellWidth);
+        const row = Math.floor((y - margin.top) / cellHeight);
+
+        if(col >= 0 && col < n && row >= 0 && row < n){
+          const d = data.find(d => d.x === col && d.y === row);
+          if(d){
+            tooltip.style.display = 'block';
+            tooltip.style.left = (e.clientX + 12) + 'px';
+            tooltip.style.top = (e.clientY + 12) + 'px';
+            tooltip.innerHTML = 
+              `<b>Exporter:</b> ${d.exporter}<br/>` +
+              `<b>Importer:</b> ${d.importer}<br/>` +
+              `<b>Quantity:</b> ${Number(d.v).toLocaleString(undefined,{maximumFractionDigits:3})}`;
+          }
+        }
+      };
+
+      canvas.onmouseout = function(){
+        tooltip.style.display = 'none';
+      };
+    }
+
+    window.addEventListener("resize", render);
+    slider.addEventListener("input", render);
+    render();
+  </script>
+</body>
+</html>
+
