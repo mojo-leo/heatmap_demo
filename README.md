@@ -65,7 +65,7 @@ The first idea is to write all the code in python while avoiding javascript and 
 - [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and a bit of js)
 - [x] `oak_trade_agent.static.holoviews_static.py` (huge file and cdn)
 - [x] `oak_trade_agent.static.plotly_static.py` (huge file no cdn)
-- [ ] `oak_trade_agent.static.d3blocks_static.py` (no slider)
+- [x] `oak_trade_agent.static.d3blocks_static.py` (no slider)
 
 ### 2) Dynamic in Python
 
@@ -92,12 +92,17 @@ Summary:
 | **HoloViews** | Declarative plotting; automatic aggregation and gridding of tidy data |
 | **Dash** | Explicit callback DAG; React-based frontend; Plotly JSON serialization |
 | **NiceGUI** | Python-firsts web UI framework; Vue.js frontend, event-driven callbacks over WebSockets |
-| **Bokeh server** | Minimal primitives only: data sources, callbacks, and WebSocket patches |
-| **Reflex (Pynecone)** | Python code compiles to a real React (Next.js) frontend with a FastAPI backend; state-driven UI, production-grade web apps |
+| **Bokeh** | Minimal primitives only: data sources, callbacks, and WebSocket patches |
+| **Reflex** | Python code wraps real React (Next.js) frontend; state-driven UI |
 
 ### 3) Static in Javascript
 
 The third approach is to depart from python, and create a single HTML file that imbeds the dataframe as well as the necessary javascript to perform all interactive operations on the client side.
+
+- [x] `oak_trade_agent.with_js.d3_static.py`
+- [x] `oak_trade_agent.with_js.echarts.py`
+- [x] `oak_trade_agent.with_js.observable.py`
+- [ ] `oak_trade_agent.with_js.chartjs.py`
 
 ### 4) Dynamic in Javascript
 
