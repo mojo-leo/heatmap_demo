@@ -75,10 +75,10 @@ Another approach is to write all the code in python and have a dynamic webapp th
 - [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.nicegui_dynamic.py` (uses plotly)
-- [ ] `oak_trade_agent.dynamic.solara_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
 - [x] `oak_trade_agent.dynamic.bokeh_dynamic.py` (uses bokeh)
 - [ ] `oak_trade_agent.dynamic.reflex_dynamic.py` (uses plotly, complicated)
+- [ ] `oak_trade_agent.dynamic.solara_dynamic.py` (uses plotly, complicated)
 - [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
 
 Summary:
