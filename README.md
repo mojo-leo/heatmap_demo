@@ -63,25 +63,25 @@ https://github.com/hal9ai/awesome-dataviz
 
 The first idea is to write all the code in python while avoiding javascript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size. Honorable mention for `d3blocks` also though it doesn't provide a slider.
 
-- [x] `oak_trade_agent.static.vega_static.py` (with cdn)
-- [x] `oak_trade_agent.static.bokeh_static.py` (with cdn and a bit of js)
-- [x] `oak_trade_agent.static.holoviews_static.py` (huge file and cdn)
-- [x] `oak_trade_agent.static.plotly_static.py` (huge file no cdn)
-- [x] `oak_trade_agent.static.d3blocks_static.py` (no slider)
+- [x] `oak_trade_agent/static/vega_static.py` (with cdn)
+- [x] `oak_trade_agent/static/bokeh_static.py` (with cdn and a bit of js)
+- [x] `oak_trade_agent/static/holoviews_static.py` (huge file and cdn)
+- [x] `oak_trade_agent/static/plotly_static.py` (huge file no cdn)
+- [x] `oak_trade_agent/static/d3blocks_static.py` (no slider)
 
 ### 2) Dynamic in Python
 
 Another approach is to write all the code in python and have a dynamic webapp that serves the content to the browser. This server can also communicate with the browser and answer requests (such as filtering the dataframe) as the user interacts with the dashboard.
 
-- [x] `oak_trade_agent.dynamic.voila_dynamic.py` (uses plotly)
-- [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
-- [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
-- [x] `oak_trade_agent.dynamic.nicegui_dynamic.py` (uses plotly)
-- [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
-- [x] `oak_trade_agent.dynamic.bokeh_dynamic.py` (uses bokeh)
-- [ ] `oak_trade_agent.dynamic.reflex_dynamic.py` (uses plotly, complicated)
-- [ ] `oak_trade_agent.dynamic.solara_dynamic.py` (uses plotly, complicated)
-- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
+- [x] `oak_trade_agent/dynamic/voila_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent/dynamic/shiny_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent/dynamic/dash_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent/dynamic/nicegui_dynamic.py` (uses plotly)
+- [x] `oak_trade_agent/dynamic/holoviews_dynamic.py` (uses bokeh)
+- [x] `oak_trade_agent/dynamic/bokeh_dynamic.py` (uses bokeh)
+- [ ] `oak_trade_agent/dynamic/reflex_dynamic.py` (uses plotly, complicated)
+- [ ] `oak_trade_agent/dynamic/solara_dynamic.py` (uses plotly, complicated)
+- [ ] `oak_trade_agent/dynamic/streamlit_dynamic.py` (uses plotly, needs old python)
 
 Summary:
 
@@ -101,16 +101,19 @@ Summary:
 
 The third approach is to depart from python, and create a single HTML file that imbeds the dataframe as well as the necessary javascript to perform all interactive operations on the client side.
 
-- [x] `oak_trade_agent.with_js.d3_static.py`
-- [x] `oak_trade_agent.with_js.echarts.py`
-- [x] `oak_trade_agent.with_js.observable.py`
-- [x] `oak_trade_agent.with_js.chartjs.py`
-- [x] `oak_trade_agent.with_js.nivo_static.py`
-- [ ] `oak_trade_agent.with_js.visx_static.py`
+- [x] `oak_trade_agent/with_js/d3_static.py`
+- [x] `oak_trade_agent/with_js/echarts.py`
+- [x] `oak_trade_agent/with_js/observable.py`
+- [x] `oak_trade_agent/with_js/chartjs.py`
+- [x] `oak_trade_agent/with_js/nivo_static.py`
+- [x] `oak_trade_agent/with_js/tui_static.py` (appealing interface)
+- [ ] `oak_trade_agent/with_js/visx_static.py`
 
 ### 4) Dynamic in Javascript
 
-The fourth approach is to start a simple RESTful python app that serves the dataframe as JSON HTTP to any client browser that requests it.
+The fourth approach is to start a simple RESTful python app that serves the dataframe as JSON HTTP to any client browser that requests it. All the libraries used above can qualify for this of course. But we have not used this solution as the test dataset is sufficently small to fit inside the static HTML. A simple server that takes `top_n` as parameter can be found here:
+
+- [x] `oak_trade_agent/data/server.py`
 
 ### 5) Ship python runtime
 
@@ -120,4 +123,10 @@ See this page that is using Panel running on Pyodide (WebAssembly):
 
 * https://panel.holoviz.org/how_to/interactivity/bind_function.html
 
-Or see "JupyterLite" where notebooks open and run without a backend kernel (also runs on Pyodide)
+Or see "JupyterLite" where notebooks open and run without a backend kernel (also uses Pyodide under the hood)
+
+- [] `oak_trade_agent/with_wasm/`
+
+You just need to serve this directory statically and point your browser to it:
+
+$ python -m http.server
