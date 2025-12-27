@@ -14,7 +14,7 @@ from rich.padding import Padding
 from rich.panel import Panel
 
 # Internal modules
-from oak_trade_agent.paths import get_input_dir
+from oak_trade_agent.paths import get_input_dir, get_output_dir
 
 
 ###############################################################################
@@ -162,13 +162,30 @@ class BaciDataset:
         df.sort_values(by=["exporter_rank", "importer_rank"], inplace=True)
         return df
 
-    def __call__(self) -> None:
+    def diagnostics(self) -> None:
         """Print some diagnostics."""
         # Show unique combination of country pairs
         print("N exporters:", len(self.oak_df["exporter_name"].unique()))
         print("N importers:", len(self.oak_df["importer_name"].unique()))
         pairs = self.oak_df[["exporter_name", "importer_name"]].drop_duplicates()
         print(pairs)
+
+    @property
+    def json(self) -> str:
+        """Returns the JSON representation of the ranked oak dataframe.
+
+        You will get something like:
+        [{"year":2023,"exporter":842,"importer":156,"product":440791,"value":270331.285,"quantity":170800.681,"exporter_name":"USA","importer_name":"China","exporter_rank":1,"importer_rank":2},{"year":2023, ...
+        """
+        return self.ranked_oak_df.to_json(orient="records")
+
+    def __call__(self) -> None:
+        """Export the dataframe to a JSON file."""
+        output_dir = get_output_dir()
+        output_dir.mkdir(exist_ok=True)
+        output_path = output_dir / "baci_dataset.json"
+        output_path.write_text(self.json)
+        print(f"Saved {output_path}")
 
 
 ###############################################################################
