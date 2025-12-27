@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Observable Plot heatmap (Top‑N countries)</title>
+
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 16px; }
+    #chart { margin-top: 10px; overflow: auto; border: 1px solid #ddd; }
+    .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  </style>
+</head>
+
+<body>
+  <h2 id="title">Exporter → Importer heatmap (Top‑N countries)</h2>
+
+  <div class="controls">
+    <label for="topN">Top N countries</label>
+    <input id="topN" type="range" min="2" max="10" step="1" value="10" />
+    <span id="topNValue" style="font-variant-numeric: tabular-nums;">10</span>
+    <span id="status"></span>
+  </div>
+
+  <div id="chart"></div>
+
+  <script type="module">
+    import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
+    const RECORDS = __EMBEDDED_DATA__;
+
+    const slider = document.getElementById("topN");
+    const topNValue = document.getElementById("topNValue");
+    const statusEl = document.getElementById("status");
+    const chartEl = document.getElementById("chart");
+
+    function fmtNumber(x) {
+      try {
+        return Number(x).toLocaleString(undefined, { maximumFractionDigits: 3 });
+      } catch {
+        return String(x);
+      }
+    }
+
+    function computeCountryOrder(records) {
+      const totals = new Map();
+      for (const r of records) {
+        const q = +r.quantity;
+        const e = r.exporter_name;
+        const i = r.importer_name;
+        if (!e || !i || !Number.isFinite(q)) continue;
+        totals.set(e, (totals.get(e) || 0) + q);
+        totals.set(i, (totals.get(i) || 0) + q);
+      }
+      return Array.from(totals.entries())
+        .sort((a, b) => b[1] - a[1])
+        .map(([name]) => name);
+    }
+
+    function buildMatrix(records, countries) {
+      const index = new Map(countries.map((c, idx) => [c, idx]));
+      const n = countries.length;
+      const z = Array.from({ length: n }, () => Array(n).fill(0));
+      for (const r of records) {
+        const e = r.exporter_name;
+        const i = r.importer_name;
+        const q = +r.quantity;
+        if (!index.has(e) || !index.has(i) || !Number.isFinite(q)) continue;
+        const col = index.get(e);
+        const row = index.get(i);
+        z[row][col] += q;
+      }
+      return z;
+    }
+
+    function renderHeatmap(DATA, n) {
+      const countries = DATA.countries.slice(0, n);
+      const zSub = DATA.z.slice(0, n).map(row => row.slice(0, n));
+
+      topNValue.textContent = String(n);
+      statusEl.textContent = `Loaded ${n} × ${n} countries`;
+
+      // Transform matrix data into array format for Observable Plot
+      const data = [];
+      for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
+          data.push({
+            exporter: countries[col],
+            importer: countries[row],
+            quantity: zSub[row][col]
+          });
+        }
+      }
+
+      // Find max value for color scale
+      let maxv = 0;
+      for (const row of zSub) {
+        for (const v of row) {
+          if (v > maxv) maxv = v;
+        }
+      }
+
+      // Clear previous chart
+      chartEl.innerHTML = "";
+
+      // Create the plot
+      const plot = Plot.plot({
+        width: Math.max(600, n * 50 + 200),
+        height: Math.max(600, n * 50 + 200),
+        marginTop: 120,
+        marginRight: 100,
+        marginBottom: 80,
+        marginLeft: 120,
+        x: {
+          label: "Exporter country",
+          domain: countries,
+          axis: "top",
+          tickRotate: -45
+        },
+        y: {
+          label: "Importer country",
+          domain: countries.slice().reverse()
+        },
+        color: {
+          type: "linear",
+          scheme: "viridis",
+          domain: [0, Math.sqrt(maxv || 1)],
+          transform: (d) => Math.sqrt(d || 0)
+        },
+        marks: [
+          Plot.cell(data, {
+            x: "exporter",
+            y: "importer",
+            fill: "quantity",
+            title: (d) => 
+              `Exporter: ${d.exporter}\nImporter: ${d.importer}\nQuantity: ${fmtNumber(d.quantity)}`
+          })
+        ]
+      });
+
+      chartEl.appendChild(plot);
+    }
+
+    function main() {
+      const records = RECORDS;
+      if (!Array.isArray(records)) throw new Error("RECORDS must be a JSON array");
+
+      const countries = computeCountryOrder(records);
+      const z = buildMatrix(records, countries);
+      const DATA = { countries, z };
+
+      const maxN = DATA.countries.length;
+      slider.min = 2;
+      slider.max = Math.max(2, maxN);
+      slider.step = 1;
+      slider.value = String(Math.min(10, maxN));
+
+      const render = () => renderHeatmap(DATA, parseInt(slider.value, 10));
+      slider.addEventListener("input", render);
+      render();
+    }
+
+    main();
+  </script>
+</body>
+</html>
+
