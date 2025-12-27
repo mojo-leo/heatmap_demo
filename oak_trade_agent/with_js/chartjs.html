@@ -4,13 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Chart.js heatmap (Top-N)</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     body{font-family:system-ui,sans-serif;margin:16px}
     .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-    #chart{margin-top:10px;width:100%;height:900px;border:1px solid #ddd;position:relative}
-    .tooltip{position:fixed;pointer-events:none;display:none;background:rgba(0,0,0,.85);color:#fff;padding:6px 8px;border-radius:6px;font-size:12px;z-index:1000}
+    #wrap{margin-top:10px;border:1px solid #ddd;padding:8px}
+    canvas{max-width:100%}
   </style>
+
+  <!-- Chart.js + Matrix plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2"></script>
 </head>
 <body>
   <h2>Exporter → Importer heatmap (Top-N by total quantity)</h2>
@@ -19,8 +22,10 @@
     <input id="n" type="range" min="2" max="10" step="1" value="10" />
     <span id="nv">10</span>
   </div>
-  <div id="chart"><canvas id="canvas"></canvas></div>
-  <div class="tooltip" id="tooltip"></div>
+
+  <div id="wrap">
+    <canvas id="c" width="950" height="950"></canvas>
+  </div>
 
   <script>
     // Template variable: pandas to_json(..., orient="records") array
@@ -34,7 +39,7 @@
         totals.set(e, (totals.get(e)||0) + q);
         totals.set(i, (totals.get(i)||0) + q);
       }
-      return Array.from(totals.entries()).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+      return Array.from(totals.entries()).sort((a,b)=>b[1]-a[1]).map(d=>d[0]);
     }
 
     function buildMatrix(records, countries){
@@ -49,155 +54,132 @@
       return z;
     }
 
-    function viridisColor(normalized){
-      // Viridis color scale approximation
-      const r = Math.floor(68 + normalized * 187);
-      const g = Math.floor(1 + normalized * 253);
-      const b = Math.floor(84 + normalized * 171);
-      return `rgb(${r},${g},${b})`;
+    function fmt(x){
+      return Number(x).toLocaleString(undefined,{maximumFractionDigits:3});
+    }
+
+    // Tiny viridis-ish gradient (good enough for demo)
+    function lerp(a,b,t){ return a + (b-a)*t; }
+    function hexToRgb(h){
+      const x = h.replace("#","");
+      return [parseInt(x.slice(0,2),16), parseInt(x.slice(2,4),16), parseInt(x.slice(4,6),16)];
+    }
+    function rgbToHex(r,g,b){
+      const f = (v)=>v.toString(16).padStart(2,"0");
+      return "#"+f(r)+f(g)+f(b);
+    }
+    // 3-stop gradient
+    const stops = ["#440154","#21918c","#fde725"].map(hexToRgb);
+    function colorFor(t){
+      t = Math.max(0, Math.min(1, t));
+      const a = t < 0.5 ? stops[0] : stops[1];
+      const b = t < 0.5 ? stops[1] : stops[2];
+      const u = t < 0.5 ? (t/0.5) : ((t-0.5)/0.5);
+      return rgbToHex(
+        Math.round(lerp(a[0], b[0], u)),
+        Math.round(lerp(a[1], b[1], u)),
+        Math.round(lerp(a[2], b[2], u)),
+      );
     }
 
     const countries = countryOrder(RECORDS);
     const Z = buildMatrix(RECORDS, countries);
 
-    const canvas = document.getElementById("canvas");
     const slider = document.getElementById("n");
     const label = document.getElementById("nv");
-    const tooltip = document.getElementById("tooltip");
-    const chartDiv = document.getElementById("chart");
 
     slider.min = 2;
     slider.max = Math.max(2, countries.length);
     slider.value = String(Math.min(10, countries.length));
 
+    const ctx = document.getElementById("c").getContext("2d");
     let chart = null;
+
+    function buildData(n){
+      const names = countries.slice(0,n);
+      const pts = [];
+      let maxv = 0;
+      for(let y=0;y<n;y++){
+        for(let x=0;x<n;x++){
+          const v = Z[y][x];
+          if (v > maxv) maxv = v;
+          pts.push({x: names[x], y: names[y], v});
+        }
+      }
+      const denom = Math.sqrt(maxv || 1);
+      // Precompute fill color per point
+      for (const p of pts){
+        const t = Math.sqrt(p.v || 0) / denom;
+        p.c = colorFor(t);
+      }
+      return { names, pts, maxv };
+    }
 
     function render(){
       const n = parseInt(slider.value, 10);
       label.textContent = String(n);
 
-      const names = countries.slice(0, n);
-      const zSub = Z.slice(0, n).map(row => row.slice(0, n));
-      
-      let maxv = 0;
-      for(const row of zSub) for(const v of row) if(v > maxv) maxv = v;
+      const { names, pts } = buildData(n);
 
-      // Prepare data for Chart.js scatter plot (we'll use it as heatmap)
-      const data = [];
-      for(let y=0; y<n; y++){
-        for(let x=0; x<n; x++){
-          data.push({
-            x: x,
-            y: y,
-            v: zSub[y][x],
-            exporter: names[x],
-            importer: names[y]
-          });
-        }
-      }
+      if (chart) chart.destroy();
 
-      if(chart) chart.destroy();
-
-      const ctx = canvas.getContext('2d');
-      const width = chartDiv.clientWidth - 40;
-      const height = 900;
-      canvas.width = width;
-      canvas.height = height;
-
-      const margin = {top: 120, right: 100, bottom: 80, left: 120};
-      const cellWidth = (width - margin.left - margin.right) / n;
-      const cellHeight = (height - margin.top - margin.bottom) / n;
-
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw cells
-      for(const d of data){
-        const x = margin.left + d.x * cellWidth;
-        const y = margin.top + d.y * cellHeight;
-        const normalized = Math.sqrt(d.v / (maxv || 1));
-        ctx.fillStyle = viridisColor(normalized);
-        ctx.fillRect(x, y, cellWidth - 1, cellHeight - 1);
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, y, cellWidth - 1, cellHeight - 1);
-      }
-
-      // Draw labels
-      ctx.fillStyle = '#000';
-      ctx.font = '12px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // X-axis labels (top)
-      for(let i=0; i<n; i++){
-        const x = margin.left + i * cellWidth + cellWidth / 2;
-        const y = margin.top - 20;
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(-Math.PI / 4);
-        ctx.textAlign = 'right';
-        ctx.fillText(names[i], 0, 0);
-        ctx.restore();
-      }
-
-      // Y-axis labels (left)
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      for(let i=0; i<n; i++){
-        const x = margin.left - 10;
-        const y = margin.top + i * cellHeight + cellHeight / 2;
-        ctx.fillText(names[i], x, y);
-      }
-
-      // Axis titles
-      ctx.textAlign = 'center';
-      ctx.font = '14px system-ui, sans-serif';
-      ctx.fillText('Exporter country', width / 2, margin.top - 60);
-      ctx.save();
-      ctx.translate(30, height / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText('Importer country', 0, 0);
-      ctx.restore();
-
-      // Add mouse interaction
-      canvas.onmousemove = function(e){
-        const rect = canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-
-        if(x < margin.left || x > width - margin.right || 
-           y < margin.top || y > height - margin.bottom){
-          tooltip.style.display = 'none';
-          return;
-        }
-
-        const col = Math.floor((x - margin.left) / cellWidth);
-        const row = Math.floor((y - margin.top) / cellHeight);
-
-        if(col >= 0 && col < n && row >= 0 && row < n){
-          const d = data.find(d => d.x === col && d.y === row);
-          if(d){
-            tooltip.style.display = 'block';
-            tooltip.style.left = (e.clientX + 12) + 'px';
-            tooltip.style.top = (e.clientY + 12) + 'px';
-            tooltip.innerHTML = 
-              `<b>Exporter:</b> ${d.exporter}<br/>` +
-              `<b>Importer:</b> ${d.importer}<br/>` +
-              `<b>Quantity:</b> ${Number(d.v).toLocaleString(undefined,{maximumFractionDigits:3})}`;
+      chart = new Chart(ctx, {
+        type: "matrix",
+        data: {
+          datasets: [{
+            data: pts,
+            backgroundColor: (c) => c.raw.c,
+            borderWidth: 0,
+            width: (c) => {
+              const a = c.chart.chartArea;
+              return a ? (a.width / n) : 10;
+            },
+            height: (c) => {
+              const a = c.chart.chartArea;
+              return a ? (a.height / n) : 10;
+            },
+          }]
+        },
+        options: {
+          animation: false,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              type: "category",
+              labels: names,
+              ticks: { autoSkip: false, maxRotation: 45, minRotation: 45 },
+              title: { display: true, text: "Exporter country" },
+              grid: { display: false },
+            },
+            y: {
+              type: "category",
+              labels: names,
+              reverse: true,
+              ticks: { autoSkip: false },
+              title: { display: true, text: "Importer country" },
+              grid: { display: false },
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: () => "",
+                label: (item) => {
+                  const x = item.raw.x;
+                  const y = item.raw.y;
+                  const v = item.raw.v;
+                  return [`Exporter: ${x}`, `Importer: ${y}`, `Quantity: ${fmt(v)}`];
+                }
+              }
+            }
           }
         }
-      };
-
-      canvas.onmouseout = function(){
-        tooltip.style.display = 'none';
-      };
+      });
     }
 
-    window.addEventListener("resize", render);
     slider.addEventListener("input", render);
     render();
   </script>
 </body>
 </html>
-
