@@ -75,9 +75,11 @@ Another approach is to write all the code in python and have a dynamic webapp th
 - [x] `oak_trade_agent.dynamic.shiny_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.dash_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.nicegui_dynamic.py` (uses plotly)
-- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
+- [ ] `oak_trade_agent.dynamic.solara_dynamic.py` (uses plotly)
 - [x] `oak_trade_agent.dynamic.holoviews_dynamic.py` (uses bokeh)
 - [x] `oak_trade_agent.dynamic.bokeh_dynamic.py` (uses bokeh)
+- [ ] `oak_trade_agent.dynamic.reflex_dynamic.py` (uses plotly, complicated)
+- [ ] `oak_trade_agent.dynamic.streamlit_dynamic.py` (uses plotly, needs old python)
 
 Summary:
 
@@ -89,8 +91,9 @@ Summary:
 | **Panel** | High-level layouts, widgets, and app composition on top of Bokeh server |
 | **HoloViews** | Declarative plotting; automatic aggregation and gridding of tidy data |
 | **Dash** | Explicit callback DAG; React-based frontend; Plotly JSON serialization |
-| **NiceGUI** | Python-first web UI framework; Vue.js frontend, event-driven callbacks over WebSockets |
+| **NiceGUI** | Python-firsts web UI framework; Vue.js frontend, event-driven callbacks over WebSockets |
 | **Bokeh server** | Minimal primitives only: data sources, callbacks, and WebSocket patches |
+| **Reflex (Pynecone)** | Python code compiles to a real React (Next.js) frontend with a FastAPI backend; state-driven UI, production-grade web apps |
 
 ### 3) Static in Javascript
 

@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - python=3.13
   - pandas
   - scipy
   - scikit-learn
@@ -14,6 +15,7 @@ dependencies:
   - plotly
   - bokeh
   - dash
+  - solara
   - streamlit
   - shiny
   - shinywidgets
@@ -31,3 +33,4 @@ dependencies:
     - py3-wget
     - d3blocks
     - clusteval
+    - reflex
