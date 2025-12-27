@@ -91,8 +91,8 @@ class BaciDataset:
         with fsspec.open(path, mode="rb") as handle:
             df = pandas.read_csv(handle, encoding="utf-8")
 
-        # Don't trust BACI to check their datasets, what does this mean for the rest
-        # of their work?
+        # Don't trust BACI to check their datasets, what does this
+        # mean for the rest of their work?
         def fix_mojibake(s: str) -> str:
             if isinstance(s, str):
                 try:

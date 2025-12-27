@@ -16,7 +16,13 @@ from functools import lru_cache
 
 # Third-party modules
 import panel as pn
-from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper
+from bokeh.models import (
+    BasicTicker,
+    ColorBar,
+    ColumnDataSource,
+    HoverTool,
+    LinearColorMapper,
+)
 from bokeh.plotting import figure
 
 ###############################################################################
@@ -89,7 +95,15 @@ class PanelWasmHeatmap:
             value=min(10, self.max_n),
         )
 
-        self.source = ColumnDataSource(data=dict(x=[], y=[], q=[]))
+        self.source = ColumnDataSource(
+            data=dict(
+                x=[],
+                y=[],
+                exporter_name=[],
+                importer_name=[],
+                quantity=[],
+            )
+        )
 
         self.mapper = LinearColorMapper(palette="Viridis256", low=0.0, high=1.0)
 
@@ -106,6 +120,16 @@ class PanelWasmHeatmap:
         self.fig.yaxis.axis_label = "Importer country"
         self.fig.xaxis.major_label_orientation = 0.785398  # 45°
 
+        self.fig.add_tools(
+            HoverTool(
+                tooltips=[
+                    ("Exporter", "@exporter_name"),
+                    ("Importer", "@importer_name"),
+                    ("Quantity", "@quantity{0,0.000}"),
+                ]
+            )
+        )
+
         self.fig.rect(
             x="x",
             y="y",
@@ -113,7 +137,7 @@ class PanelWasmHeatmap:
             height=1,
             source=self.source,
             line_color=None,
-            fill_color={"field": "q", "transform": self.mapper},
+            fill_color={"field": "quantity", "transform": self.mapper},
         )
 
         color_bar = ColorBar(
@@ -140,20 +164,30 @@ class PanelWasmHeatmap:
         n = int(self.slider.value)
         names = countries[:n]
 
-        xs, ys, qs = [], [], []
+        xs, ys, exporters, importers, quantities = [], [], [], [], []
         vmax = 0.0
         for yi in range(n):
             for xi in range(n):
                 v = float(mat[yi][xi])
                 vmax = max(vmax, v)
-                xs.append(names[xi])
-                ys.append(names[yi])
-                qs.append(v)
+                exporter = names[xi]
+                importer = names[yi]
+                xs.append(exporter)
+                ys.append(importer)
+                exporters.append(exporter)
+                importers.append(importer)
+                quantities.append(v)
 
         # Update axis ranges + data
         self.fig.x_range.factors = names
         self.fig.y_range.factors = list(reversed(names))
-        self.source.data = dict(x=xs, y=ys, q=qs)
+        self.source.data = dict(
+            x=xs,
+            y=ys,
+            exporter_name=exporters,
+            importer_name=importers,
+            quantity=quantities,
+        )
 
         # Keep 0 white-ish by starting low at 0
         self.mapper.low = 0.0
