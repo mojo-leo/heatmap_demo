@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Built-in modules
 import webbrowser
 from functools import cached_property
+from pathlib import Path
 
+# Third-party modules
 import holoviews as hv
-import pandas as pd
 import panel as pn
 from panel.io import save as pn_save
 
+# Internal modules
 from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
 
+# Set the backend for HoloViews
 hv.extension("bokeh")
 pn.extension()
 
@@ -97,7 +101,7 @@ class HoloViewsHeatmapStatic:
             sizing_mode="stretch_width",
         )
 
-    def __call__(self) -> None:
+    def __call__(self) -> Path:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "holoviews_static.html"
@@ -115,6 +119,7 @@ class HoloViewsHeatmapStatic:
 
         print(f"Saved {output_path} — open it in your browser.")
         webbrowser.open(f"file://{output_path.absolute()}")
+        return output_path
 
 
 ###############################################################################

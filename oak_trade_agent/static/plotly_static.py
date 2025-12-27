@@ -4,6 +4,7 @@
 # Built-in modules
 import webbrowser
 from functools import cached_property
+from pathlib import Path
 
 # Third-party modules
 import numpy as np
@@ -166,7 +167,7 @@ class PlotlyHeatmapOffline:
 
         return fig
 
-    def __call__(self) -> None:
+    def __call__(self) -> Path:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "plotly_static.html"
@@ -178,6 +179,7 @@ class PlotlyHeatmapOffline:
         )
         print(f"Saved {output_path} — open it in your browser.")
         webbrowser.open(f"file://{output_path.absolute()}")
+        return output_path
 
 
 ###############################################################################

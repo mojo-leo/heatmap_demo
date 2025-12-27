@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 # Built-in modules
 import webbrowser
 from functools import cached_property
+from pathlib import Path
 
 # Third-party modules
 import pandas as pd
@@ -45,7 +45,7 @@ class D3BlocksHeatmap:
         )
         return mat
 
-    def __call__(self, top_n: int = 10) -> None:
+    def __call__(self, top_n: int = 10) -> Path:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
 
@@ -62,6 +62,7 @@ class D3BlocksHeatmap:
 
         print(f"Saved {output_path}")
         webbrowser.open(f"file://{output_path.absolute()}")
+        return output_path
 
 
 ###############################################################################

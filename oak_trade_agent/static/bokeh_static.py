@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Built-in modules
 import webbrowser
 from functools import cached_property
+from pathlib import Path
 
+# Third-party modules
 from bokeh.io import output_file, save
 from bokeh.layouts import column
 from bokeh.models import (
@@ -16,6 +19,7 @@ from bokeh.models import (
 from bokeh.palettes import Viridis256
 from bokeh.plotting import figure
 
+# Internal modules
 from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
 
@@ -145,7 +149,7 @@ class BokehHeatmapResize:
 
         return column(slider, p)
 
-    def __call__(self) -> None:
+    def __call__(self) -> Path:
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "bokeh_static.html"
@@ -153,6 +157,7 @@ class BokehHeatmapResize:
         save(self.layout)
         print(f"Saved {output_path} — open it in your browser.")
         webbrowser.open(f"file://{output_path.absolute()}")
+        return output_path
 
 
 ###############################################################################
