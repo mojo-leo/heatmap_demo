@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+    <!-- Pyodide -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.28.2/full/pyodide.js"></script>
+
+    <!-- Bokeh JS (Panel will use this in the browser) -->
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.8.1.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.8.1.min.js"></script>
+    <script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.8.1.min.js"></script>
+
+    <!-- Panel JS runtime -->
+    <script src="https://cdn.jsdelivr.net/npm/@holoviz/panel@1.8.4/dist/panel.min.js"></script>
+
+    <title>Panel (Pyodide/WASM) Heatmap</title>
+
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 16px; }
+      #app { min-height: 200px; }
+      .hint { color: #666; font-size: 12px; margin-top: 6px; }
+    </style>
+  </head>
+
+  <body>
+    <h2>Panel running in the browser (Pyodide / WASM)</h2>
+    <div class="hint">This runs Python client-side (no server kernel).</div>
+    <div id="app"></div>
+
+    <script>
+      async function main() {
+        const pyodide = await loadPyodide();
+
+        // Install Panel + Bokeh Python wheels (needed for the Python side)
+        await pyodide.loadPackage("micropip");
+        const micropip = pyodide.pyimport("micropip");
+
+        await micropip.install([
+          "https://cdn.holoviz.org/panel/1.8.4/dist/wheels/bokeh-3.8.1-py3-none-any.whl",
+          "https://cdn.holoviz.org/panel/1.8.4/dist/wheels/panel-1.8.4-py3-none-any.whl"
+        ]);
+
+        // Load and run your Python app from app.py
+        const code = await (await fetch("app.py")).text();
+        pyodide.runPython(code);
+      }
+
+      main();
+    </script>
+  </body>
+</html>
