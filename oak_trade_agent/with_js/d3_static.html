@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exporter → Importer heatmap (Top‑N countries)</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 16px; }
+    #chart { margin-top: 10px; overflow: auto; border: 1px solid #ddd; }
+    .controls { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .tooltip { position:fixed; pointer-events:none; display:none; background:rgba(0,0,0,.85); color:#fff; padding:6px 8px; border-radius:6px; font-size:12px; }
+    .axis text { font-size:10px; }
+  </style>
+</head>
+
+<body>
+  <h2 id="title">Exporter → Importer heatmap (Top‑N countries)</h2>
+
+  <div class="controls">
+    <label for="topN">Top N countries</label>
+    <input id="topN" type="range" min="2" max="10" step="1" value="10" />
+    <span id="topNValue" style="font-variant-numeric: tabular-nums;">10</span>
+    <span id="status"></span>
+  </div>
+
+  <div id="chart"></div>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const RECORDS = __EMBEDDED_DATA__;
+
+    const slider = document.getElementById("topN");
+    const topNValue = document.getElementById("topNValue");
+    const statusEl = document.getElementById("status");
+    const chartEl = document.getElementById("chart");
+    const tooltipEl = d3.select("#tooltip");
+
+    const cell = 10;
+    const margin = { top: 120, right: 40, bottom: 40, left: 120 };
+
+    function fmtNumber(x) {
+      try {
+        return Number(x).toLocaleString(undefined, { maximumFractionDigits: 3 });
+      } catch {
+        return String(x);
+      }
+    }
+
+    function computeCountryOrder(records) {
+      const totals = new Map();
+      for (const r of records) {
+        const q = +r.quantity;
+        const e = r.exporter_name;
+        const i = r.importer_name;
+        if (!e || !i || !Number.isFinite(q)) continue;
+        totals.set(e, (totals.get(e) || 0) + q);
+        totals.set(i, (totals.get(i) || 0) + q);
+      }
+      return Array.from(totals.entries())
+        .sort((a, b) => d3.descending(a[1], b[1]))
+        .map(([name]) => name);
+    }
+
+    function buildMatrix(records, countries) {
+      const index = new Map(countries.map((c, idx) => [c, idx]));
+      const n = countries.length;
+      const z = Array.from({ length: n }, () => Array(n).fill(0));
+      for (const r of records) {
+        const e = r.exporter_name;
+        const i = r.importer_name;
+        const q = +r.quantity;
+        if (!index.has(e) || !index.has(i) || !Number.isFinite(q)) continue;
+        const col = index.get(e);
+        const row = index.get(i);
+        z[row][col] += q;
+      }
+      return z;
+    }
+
+    function colorScaleFor(zSub) {
+      let maxv = 0;
+      for (const row of zSub) for (const v of row) if (v > maxv) maxv = v;
+      const scale = d3.scaleSequential()
+        .domain([0, Math.sqrt(maxv || 1)])
+        .interpolator(d3.interpolateViridis);
+      return (v) => scale(Math.sqrt(v || 0));
+    }
+
+    function clearChart() {
+      chartEl.innerHTML = "";
+    }
+
+    function renderHeatmap(DATA, n) {
+      const countries = DATA.countries.slice(0, n);
+      const zSub = DATA.z.slice(0, n).map(row => row.slice(0, n));
+
+      topNValue.textContent = String(n);
+      statusEl.textContent = `Loaded ${n} × ${n} countries`;
+
+      const width = margin.left + margin.right + n * cell;
+      const height = margin.top + margin.bottom + n * cell;
+
+      clearChart();
+
+      const svg = d3.select(chartEl)
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      const fill = colorScaleFor(zSub);
+
+      const xg = svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(${margin.left}, ${margin.top - 10})`);
+
+      xg.selectAll("text")
+        .data(countries)
+        .enter()
+        .append("text")
+        .attr("text-anchor", "start")
+        .attr("transform", (d, i) => `translate(${i * cell + cell / 2},0) rotate(-45)`)
+        .text(d => d);
+
+      const yg = svg.append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(${margin.left - 10}, ${margin.top})`);
+
+      yg.selectAll("text")
+        .data(countries)
+        .enter()
+        .append("text")
+        .attr("text-anchor", "end")
+        .attr("dominant-baseline", "middle")
+        .attr("x", 0)
+        .attr("y", (d, i) => i * cell + cell / 2)
+        .text(d => d);
+
+      const g = svg.append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+      const cells = [];
+      for (let row = 0; row < n; row++) {
+        for (let col = 0; col < n; col++) {
+          cells.push({ row, col, v: zSub[row][col] });
+        }
+      }
+
+      g.selectAll("rect")
+        .data(cells)
+        .enter()
+        .append("rect")
+        .attr("x", d => d.col * cell)
+        .attr("y", d => d.row * cell)
+        .attr("width", cell)
+        .attr("height", cell)
+        .attr("fill", d => fill(d.v))
+        .on("mousemove", (event, d) => {
+          tooltipEl
+            .style("display", "block")
+            .style("left", (event.clientX + 12) + "px")
+            .style("top", (event.clientY + 12) + "px")
+            .html(
+              `<b>Exporter:</b> ${countries[d.col]}<br/>` +
+              `<b>Importer:</b> ${countries[d.row]}<br/>` +
+              `<b>Quantity:</b> ${fmtNumber(d.v)}`
+            );
+        })
+        .on("mouseout", () => tooltipEl.style("display", "none"));
+    }
+
+    function main() {
+      const records = RECORDS;
+      if (!Array.isArray(records)) throw new Error("RECORDS must be a JSON array");
+
+      const countries = computeCountryOrder(records);
+      const z = buildMatrix(records, countries);
+      const DATA = { countries, z };
+
+      const maxN = DATA.countries.length;
+      slider.min = 2;
+      slider.max = Math.max(2, maxN);
+      slider.step = 1;
+      slider.value = String(Math.min(10, maxN));
+
+      const render = () => renderHeatmap(DATA, parseInt(slider.value, 10));
+      slider.addEventListener("input", render);
+      render();
+    }
+
+    main();
+  </script>
+</body>
+</html>
