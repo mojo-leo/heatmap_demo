@@ -73,8 +73,17 @@
     xAxis: { title: 'Exporter country', label: { interval: 0, rotate: 45 } },
     yAxis: { title: 'Importer country', label: { interval: 0 } },
     tooltip: { formatter: (v) => (Number.isFinite(v) ? v.toLocaleString(undefined,{maximumFractionDigits:3}) : String(v)) },
-    legend: { visible: false },
-    series: { selectable: false },
+    legend: {
+      visible: true,
+      align: 'right'
+    },
+    series: {
+      selectable: false,
+      colorScale: {
+        minColor: '#f7fbff',
+        maxColor: '#08306b'
+      }
+    },
   };
 
   function render(n){
