@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Toast UI Chart heatmap (Top-N countries)</title>
+  <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:16px}
+    .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    #chart{width:900px;max-width:100%;height:820px}
+    .hint{color:#666;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="row">
+    <label><b>Top N countries</b>: <span id="nval"></span></label>
+    <input id="n" type="range" min="2" max="10" step="1" value="10" style="width:340px" />
+    <span class="hint">X = Exporter · Y = Importer</span>
+  </div>
+  <div id="chart"></div>
+
+  <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
+  <script>
+  // Embedded BACI records (orient="records")
+  const RECORDS = __EMBEDDED_DATA__;
+
+  // ---- Prepare ranks + ordered country list ----
+  const rankByCountry = new Map();
+  for (const r of RECORDS) {
+    const e = r.exporter_name, i = r.importer_name;
+    const er = +r.exporter_rank, ir = +r.importer_rank;
+    if (e && Number.isFinite(er)) rankByCountry.set(e, Math.min(rankByCountry.get(e) ?? Infinity, er));
+    if (i && Number.isFinite(ir)) rankByCountry.set(i, Math.min(rankByCountry.get(i) ?? Infinity, ir));
+  }
+  const countries = Array.from(rankByCountry.entries())
+    .sort((a,b)=>a[1]-b[1])
+    .map(([name])=>name);
+
+  const maxN = countries.length;
+  const nInput = document.getElementById('n');
+  const nVal = document.getElementById('nval');
+  nInput.max = String(maxN);
+  nInput.value = String(Math.min(10, maxN));
+
+  // ---- Build FULL matrix once (sum quantities) ----
+  const idx = new Map(countries.map((c, k)=>[c, k]));
+  const M = Array.from({length: maxN}, ()=>Array(maxN).fill(0));
+  for (const r of RECORDS) {
+    const x = idx.get(r.exporter_name);
+    const y = idx.get(r.importer_name);
+    if (x == null || y == null) continue;
+    const q = +r.quantity;
+    if (!Number.isFinite(q)) continue;
+    M[y][x] += q; // rows = importer (Y), cols = exporter (X)
+  }
+
+  // ---- Chart ----
+  let chart = null;
+  function makeData(n){
+    return {
+      categories: {
+        x: countries.slice(0, n),
+        y: countries.slice(0, n),
+      },
+      series: M.slice(0, n).map(row => row.slice(0, n)),
+    };
+  }
+
+  const el = document.getElementById('chart');
+  const options = {
+    chart: { width: el.clientWidth, height: el.clientHeight, title: 'Exporter → Importer heatmap (Top-N by total trade)' },
+    xAxis: { title: 'Exporter country', label: { interval: 0, rotate: 45 } },
+    yAxis: { title: 'Importer country', label: { interval: 0 } },
+    tooltip: { formatter: (v) => (Number.isFinite(v) ? v.toLocaleString(undefined,{maximumFractionDigits:3}) : String(v)) },
+    legend: { visible: false },
+    series: { selectable: false },
+  };
+
+  function render(n){
+    nVal.textContent = String(n);
+    const data = makeData(n);
+    if (!chart) {
+      chart = toastui.Chart.heatmapChart({ el, data, options });
+      return;
+    }
+    // Prefer live update if available; otherwise recreate.
+    if (typeof chart.setData === 'function') {
+      chart.setData(data);
+    } else {
+      if (typeof chart.destroy === 'function') chart.destroy();
+      chart = toastui.Chart.heatmapChart({ el, data, options });
+    }
+  }
+
+  nInput.addEventListener('input', (e)=>render(+e.target.value));
+  render(+nInput.value);
+
+  // Keep it usable on resize
+  window.addEventListener('resize', ()=>{
+    if (chart && typeof chart.resize === 'function') chart.resize({ width: el.clientWidth, height: el.clientHeight });
+  });
+  </script>
+</body>
+</html>
