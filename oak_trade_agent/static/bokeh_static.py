@@ -20,10 +20,11 @@ from bokeh.models import (
     Slider,
     Spacer,
 )
-from bokeh.palettes import Viridis256
+from bokeh.palettes import brewer, interp_palette
 from bokeh.plotting import figure
 
 # Internal modules
+from common import split_thousands
 from oak_trade_agent import project_url
 from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
@@ -59,16 +60,17 @@ class BokehHeatmapResize:
         max_positive = float(positive.max()) if len(positive) else 1.0
         low = 1.0 if max_positive >= 1.0 else min_positive
         df["quantity_color"] = df["quantity"].clip(lower=low)
+        df["quantity_display"] = df["quantity"].map(split_thousands)
+        df["value_display"] = (df["value"] * 1000).map(split_thousands)
 
         # Max N from ranks
         max_n = len(baci.country_ranks)
         initial_n = min(10, max_n)
 
-        # --- UI helpers (mimic the TUI header + slider row) ---
-        def _topn_label(n: int) -> str:
-            # Using HTML for maximum compatibility across Bokeh versions.
-            # Keep the number in a fixed-width box so the slider doesn't shift
-            # when going from 9 → 10 → 100, etc.
+        def topn_label(n: int) -> str:
+            """Using HTML for maximum compatibility across Bokeh versions.
+            Keep the number in a fixed-width box so the slider doesn't shift
+            when going from 9 → 10 → 100, etc."""
             return (
                 "<label><b>Top N countries displayed</b>: "
                 f"<span style='display:inline-block;min-width:3ch;text-align:right'>{n}</span>"
@@ -96,9 +98,13 @@ class BokehHeatmapResize:
         mask = (df["exporter_rank"] <= initial_n) & (df["importer_rank"] <= initial_n)
         source_view = ColumnDataSource(df[mask])
 
+        # Palette: green → cyan → deep blue (close to Altair/Vega-Lite default feel
+        # for heatmaps) while keeping a logarithmic color scale.
+        gnbu_256 = interp_palette(list(reversed(brewer["GnBu"][9])), 256)
+
         # Color mapper (log scale)
         color_mapper = LogColorMapper(
-            palette=Viridis256,
+            palette=gnbu_256,
             low=low,
             high=float(df["quantity"].max()),
         )
@@ -136,8 +142,8 @@ class BokehHeatmapResize:
                 tooltips=[
                     ("Exporter", "@exporter_name"),
                     ("Importer", "@importer_name"),
-                    ("Quantity (tons)", "@quantity{0,0.00}"),
-                    ("Value ($)", "@value{0,0.00}"),
+                    ("Metric tons", "@quantity_display"),
+                    ("Value ($)", "@value_display"),
                 ],
             )
         )
@@ -145,7 +151,7 @@ class BokehHeatmapResize:
         p.add_layout(
             ColorBar(
                 color_mapper=color_mapper,
-                title="Quantity (tons, log scale)",
+                title="Quantity (metric tons, log scale)",
                 ticker=LogTicker(),
             ),
             "right",
@@ -161,14 +167,14 @@ class BokehHeatmapResize:
             )
         )
         n_label = Div(
-            text=_topn_label(initial_n),
+            text=topn_label(initial_n),
             width=260,
             styles={"font-size": "16px", "white-space": "nowrap"},
         )
         legend = Div(
             text=(
                 "<span style='color:#666;font-size:12px'>"
-                "Exporter \u2192 Importer quantities from the "
+                "Exporter → Importer quantities from the "
                 f"<a href='{self.baci_url}' target='_blank' rel='noopener noreferrer'>BACI dataset</a>"
                 " (2023)"
                 "<br/>"
