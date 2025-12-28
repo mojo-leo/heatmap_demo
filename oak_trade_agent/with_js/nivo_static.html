@@ -9,6 +9,7 @@
     .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
     #chart{margin-top:10px;height:900px;border:1px solid #ddd}
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/pako@2/dist/pako.min.js"></script>
   <script type="importmap">
     {
       "imports": {
@@ -36,8 +37,19 @@
     // IMPORTANT: externalize react/react-dom so Nivo uses the same React instance
     import { ResponsiveHeatMapCanvas } from "https://esm.sh/@nivo/heatmap@0.99.0?external=react,react-dom";
 
-    // Template variable: pandas to_json(..., orient="records") array
-    const RECORDS = __EMBEDDED_DATA__;
+    // Decompress base64-encoded gzip data
+    function decompressData(base64Data) {
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const decompressed = pako.inflate(bytes, { to: 'string' });
+      return JSON.parse(decompressed);
+    }
+    
+    // Template variable: base64-encoded gzip-compressed JSON
+    const RECORDS = decompressData(__EMBEDDED_DATA__);
     if (!Array.isArray(RECORDS)) throw new Error("RECORDS must be a JSON array");
 
     function countryOrder(records){

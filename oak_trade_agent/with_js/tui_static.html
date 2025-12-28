@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Toast UI Chart heatmap (Top-N countries)</title>
   <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/pako@2/dist/pako.min.js"></script>
   <style>
     body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:16px}
     .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -22,8 +23,19 @@
 
   <script src="https://uicdn.toast.com/chart/latest/toastui-chart.min.js"></script>
   <script>
-  // Embedded BACI records (orient="records")
-  const RECORDS = __EMBEDDED_DATA__;
+  // Decompress base64-encoded gzip data
+  function decompressData(base64Data) {
+    const binaryString = atob(base64Data);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const decompressed = pako.inflate(bytes, { to: 'string' });
+    return JSON.parse(decompressed);
+  }
+  
+  // Template variable: base64-encoded gzip-compressed JSON
+  const RECORDS = decompressData(__EMBEDDED_DATA__);
 
   // ---- Prepare ranks + ordered country list ----
   const rankByCountry = new Map();

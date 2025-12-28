@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 # Built-in modules
+import base64
+import gzip
 from functools import cached_property
 from pathlib import Path
 
@@ -180,8 +182,15 @@ class BaciDataset:
         """
         return self.ranked_oak_df.to_json(orient="records")
 
+    @cached_property
+    def json_gzip_base64(self) -> str:
+        """Compress JSON string using gzip and encode as base64."""
+        json_bytes = self.json.encode("utf-8")
+        compressed = gzip.compress(json_bytes)
+        return base64.b64encode(compressed).decode("utf-8")
+
     def __call__(self) -> None:
-        """Export the dataframe to a JSON file."""
+        """Export the uncompresseddataframe to a JSON file."""
         output_dir = get_output_dir()
         output_dir.mkdir(exist_ok=True)
         output_path = output_dir / "baci_dataset.json"

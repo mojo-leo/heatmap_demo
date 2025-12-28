@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ECharts heatmap (Top-N)</title>
   <script src="https://cdn.jsdelivr.net/npm/echarts@5"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pako@2/dist/pako.min.js"></script>
   <style>
     body{font-family:system-ui,sans-serif;margin:16px}
     .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -21,8 +22,19 @@
   <div id="chart"></div>
 
   <script>
-    // Template variable: pandas to_json(..., orient="records") array
-    const RECORDS = __EMBEDDED_DATA__;
+    // Decompress base64-encoded gzip data
+    function decompressData(base64Data) {
+      const binaryString = atob(base64Data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      const decompressed = pako.inflate(bytes, { to: 'string' });
+      return JSON.parse(decompressed);
+    }
+    
+    // Template variable: base64-encoded gzip-compressed JSON
+    const RECORDS = decompressData(__EMBEDDED_DATA__);
 
     function countryOrder(records){
       const totals = new Map();

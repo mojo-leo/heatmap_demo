@@ -25,7 +25,8 @@ class TemplateHTML:
     def body(self) -> str:
         html_template_path = Path(__file__).parent / self.template_name
         html_content = Path(html_template_path).read_text()
-        return html_content.replace("__EMBEDDED_DATA__", baci.json)
+        # Wrap the base64 string in quotes to make it a valid JavaScript string literal
+        return html_content.replace("__EMBEDDED_DATA__", f'"{baci.json_gzip_base64}"')
 
     def __call__(self) -> Path:
         output_path = get_output_dir() / self.template_name
