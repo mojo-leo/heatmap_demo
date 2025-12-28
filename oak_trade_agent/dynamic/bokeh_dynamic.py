@@ -48,6 +48,19 @@ class BokehServerHeatmap:
 
         source = ColumnDataSource(df0)
 
+        exporters_ordered = (
+            df0[["exporter_name", "exporter_rank"]]
+            .drop_duplicates()
+            .sort_values("exporter_rank")["exporter_name"]
+            .tolist()
+        )
+        importers_ordered = (
+            df0[["importer_name", "importer_rank"]]
+            .drop_duplicates()
+            .sort_values("importer_rank")["importer_name"]
+            .tolist()
+        )
+
         mapper = LinearColorMapper(
             palette="Viridis256",
             low=float(df0["quantity"].min()),
@@ -56,8 +69,9 @@ class BokehServerHeatmap:
 
         p = figure(
             title=self.title,
-            x_range=sorted(df0["exporter_name"].unique().tolist()),
-            y_range=sorted(df0["importer_name"].unique().tolist()),
+            x_range=exporters_ordered,
+            # Bokeh draws first y factor at the bottom; reverse for top-on-top ordering.
+            y_range=list(reversed(importers_ordered)),
             x_axis_location="above",
             width=800,
             height=800,
@@ -101,8 +115,21 @@ class BokehServerHeatmap:
         def on_slider_change(attr, old, new):
             df_new = self._filtered_df(int(new))
             source.data = ColumnDataSource.from_df(df_new)
-            p.x_range.factors = sorted(df_new["exporter_name"].unique().tolist())
-            p.y_range.factors = sorted(df_new["importer_name"].unique().tolist())
+            exporters_ordered = (
+                df_new[["exporter_name", "exporter_rank"]]
+                .drop_duplicates()
+                .sort_values("exporter_rank")["exporter_name"]
+                .tolist()
+            )
+            importers_ordered = (
+                df_new[["importer_name", "importer_rank"]]
+                .drop_duplicates()
+                .sort_values("importer_rank")["importer_name"]
+                .tolist()
+            )
+            p.x_range.factors = exporters_ordered
+            # Reverse so top-ranked importers appear at the top visually.
+            p.y_range.factors = list(reversed(importers_ordered))
             mapper.low = float(df_new["quantity"].min())
             mapper.high = float(df_new["quantity"].max())
 
@@ -129,4 +156,3 @@ bokeh_server_heatmap = BokehServerHeatmap()
 # Run the singleton when run as a script
 if __name__ == "__main__":
     bokeh_server_heatmap()
-C
