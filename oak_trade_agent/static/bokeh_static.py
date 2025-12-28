@@ -24,6 +24,7 @@ from bokeh.palettes import Viridis256
 from bokeh.plotting import figure
 
 # Internal modules
+from oak_trade_agent import project_url
 from oak_trade_agent.data.baci_dataset import baci
 from oak_trade_agent.paths import get_output_dir
 
@@ -37,7 +38,9 @@ class BokehHeatmapResize:
     The resulting HTML file size is: 80 KB
     """
 
-    title = "Exporter → Importer heatmap (resize by Top-N countries)"
+    title = "Oak roundwood and sawnwood international commerce heatmap"
+    baci_url = "https://www.cepii.fr/DATA_DOWNLOAD/baci/doc/baci_webpage.html"
+    subtitle = "Exporter → Importer quantities from the BACI 2023 dataset"
 
     @cached_property
     def layout(self):
@@ -64,7 +67,13 @@ class BokehHeatmapResize:
         # --- UI helpers (mimic the TUI header + slider row) ---
         def _topn_label(n: int) -> str:
             # Using HTML for maximum compatibility across Bokeh versions.
-            return f"<label><b>Top N countries</b>: {n}</label>"
+            # Keep the number in a fixed-width box so the slider doesn't shift
+            # when going from 9 → 10 → 100, etc.
+            return (
+                "<label><b>Top N countries displayed</b>: "
+                f"<span style='display:inline-block;min-width:3ch;text-align:right'>{n}</span>"
+                "</label>"
+            )
 
         # Build ordered lists of countries by rank (very important)
         exporters_ordered = (
@@ -143,18 +152,31 @@ class BokehHeatmapResize:
         )
         p.xaxis.major_label_orientation = 1.0
 
-        # --- Controls row (TUI-like) ---
+        # --- Title + Controls ---
         title_div = Div(
-            text="<div style='font-size:32px;font-weight:700;margin:6px 0 14px 0;'>"
-            "Exporter \u2192 Importer heatmap (Top-N by total trade)"
-            "</div>",
+            text=(
+                "<div style='font-size:24px;font-weight:700;margin:6px 0 8px 0;'>"
+                f"{self.title}"
+                "</div>"
+            )
         )
         n_label = Div(
             text=_topn_label(initial_n),
-            styles={"font-size": "16px"},
+            width=260,
+            styles={"font-size": "16px", "white-space": "nowrap"},
         )
-        hint = Div(
-            text="<span style='color:#666;font-size:12px'>X = Exporter \u00b7 Y = Importer</span>",
+        legend = Div(
+            text=(
+                "<span style='color:#666;font-size:12px'>"
+                "Exporter \u2192 Importer quantities from the "
+                f"<a href='{self.baci_url}' target='_blank' rel='noopener noreferrer'>BACI dataset</a>"
+                " (2023)"
+                "<br/>"
+                "Graph generated with this "
+                f"<a href='{project_url}' target='_blank' rel='noopener noreferrer'>python code</a>,"
+                "</span>"
+            ),
+            styles={"text-align": "right"},
         )
 
         slider = Slider(
@@ -163,6 +185,7 @@ class BokehHeatmapResize:
             value=initial_n,
             step=1,
             title="",
+            show_value=False,
             width=340,
             bar_color="#2563eb",
         )
@@ -185,19 +208,20 @@ class BokehHeatmapResize:
 
         controls = row(
             n_label,
+            Spacer(width=1),
             slider,
             Spacer(sizing_mode="stretch_width"),
-            hint,
+            legend,
             sizing_mode="stretch_width",
             margin=(0, 0, 10, 0),
         )
-        return column(controls, title_div, p, sizing_mode="stretch_both")
+        return column(title_div, controls, p, sizing_mode="stretch_both")
 
     SLIDER_JS_CODE = """
     const N = cb_obj.value;
 
     // Update the "Top N countries: N" label (TUI-like header row)
-    n_label.text = `<label><b>Top N countries</b>: ${N}</label>`;
+    n_label.text = `<label><b>Top N countries displayed</b>: <span style='display:inline-block;min-width:3ch;text-align:right'>${N}</span></label>`;
 
     // 1) Update the categorical axes to top-N lists
     // (this "resizes" the heatmap)
