@@ -5,7 +5,7 @@
 Our first objective is simply to compare browser-based plotting methods by generating a heatmap. For this, we explore several different strategies and multiple technologies.
 
 <p align="center">
-<img height="128" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood">
+<img height="256" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood and a heatmap">
 </p>
 
 
