@@ -1,11 +1,6 @@
-
-
-
 # 2025
 
 ## Building and Evaluating Data Agents
-
-
 
 ### Course description
 
@@ -62,34 +57,34 @@
     - You will compare the offline evaluation metric. Both
 
 
-- Goal, Plan and Action  GPA
+- Goal, Plan and Action GPA
 
-    - Chat GPT deep research would be considered a data agent. It only makes use of data
+    - ChatGPT deep research would be considered a data agent. It only makes use of data
       that is available on the web.
 
-    - In many entreprise settings, it might be useful to make useful of data that is
+    - In many enterprise settings, it might be useful to make useful of data that is
       available internally. Snowflake intelligence is one example of such an agent that
       works on company internal data.
 
-    - Example use of 3 data agents to answer a complex query. "Identify regulatory
+    - Example use of three data agents to answer a complex query. "Identify regulatory
       changes in the financial services industry. Identify pending deals in industries
       that are currently experiencing regulatory changes. Help reposition our value
       proposition for each given the changes.
 
-        - Pending deals <- Proprietary database retrieved through SQL
-        - Regulatory changes <- Web search
-        - Enhance value proposition <- internal search into meeting notes
+        - Pending deals ← Proprietary database retrieved through SQL
+        - Regulatory changes ← Web search
+        - Enhance value proposition ← internal search into meeting notes
 
     - Goal: responding to a query
     - Plan: to accomplish the goal. **Query decomposition**. Decompose the query into 3 sub-queries.
-    - Action to achieve various sub goals. Interactions between plan and action.
+    - Action to achieve various subgoals. Interactions between plan and action.
 
     - Trustworthy agents Execute with Goal, Plan and Action aligned.
 
         - How do we measure an agent's GPA?
         - Plan quality
         - Plan adherence: deviations from the plan can be indications of failure modes
-        - Execution efficiency also implemented with an LLM judge. Checks whether the
+        - Execution efficiency is also implemented with an LLM judge. Checks whether the
           execution part of the Agent was the most efficient part. It can help identify
           redundancies which are sources of improvement.
         - Logical consistency. At the intersection. Check consistencies between plan &
@@ -98,9 +93,9 @@
     - Lesson 2 Build a data agent
     - Lesson 3 Expand data agent capabilities for data search with the langgraph open
       source framework
-    - Lesson 4 Observe Agent Performance using Truelens open source library for
+    - Lesson 4 Observe Agent Performance using the Truelens open source library for
       evaluating agents.
-    - Lesson 5 expand evaluation to measure agents GPA. Meausre consistency and plan
+    - Lesson 5 expand evaluation to measure agents GPA. Measure consistency and plan
       adherence as well as failure modes that can be catched. F
     - Lesson 6 improve Agents GPA
 
@@ -118,8 +113,6 @@ prompts.py defines the following functions:
 - plan_prompt
 - executor_prompt
 - agent_system_prompt
-
-
 
 
 ```python
@@ -143,7 +136,7 @@ class State(MessagesState):
 
 - Query structured sales data using SQL
 
-- Query un structured meeting notes, for example discovery call.
+- Query unstructured meeting notes, for example, discovery call.
 
 
 Cortex analyst relies on a **semantic model**
@@ -152,7 +145,7 @@ Cortex analyst relies on a **semantic model**
 - describes the Cortex agent tool
 
 
-TODO: find what is the semantic model. Where is it defined?
+TODO: find what the semantic model is. Where is it defined?
 
 Documentation of a react_agent in this context:
 
@@ -192,21 +185,17 @@ Truelens otel tracing with the open ai provider used to measure agent performanc
 - In the instrument attributes `ret` represents the return of the function and `args`
   represents the input of the functions
 
-
 Comment Paul: never seen such a complex decorator.
 
 Understand the entire trace of the agent. The new instrumentations provides key labels
 on each step. Helps extract query and retrieved text. Without which the information
 would be buried in a complex data structure that would be hard to retrieve.
 
-
 Dashboard reads traces and evaluation data. Explore traces to understand what's going
 wrong and identify different failure modes.
 
 
-
 ### Lesson 5 expand evaluation to measure agents GPA
-
 
 
 ### Lesson 6 improve Agents GPA

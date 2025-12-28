@@ -12,7 +12,7 @@ The long term idea is to create an LLM-type agent. The goal of this agent is to 
 
 - What was the import of oak sawnwood by Germany from France in 2015?
 
-    - Must find the productcode for oak sawnwood 4407??
+    - Must find the product code for oak sawnwood 4407??
 
         > "440791 - Wood; oak (Quercus spp.), sawn or chipped lengthwise, sliced or peeled, whether or not planed, sanded or finger-jointed, thicker than 6mm"
 
@@ -24,7 +24,7 @@ The long term idea is to create an LLM-type agent. The goal of this agent is to 
 
     - Pseudo SQL code:
 
-        select sum(x) for reporter == "Germany"
+        `select sum(x) for reporter == "Germany"`
 
 - What was the largest oak sawnwood importer in 2020?
 
