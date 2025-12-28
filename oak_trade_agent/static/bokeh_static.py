@@ -29,8 +29,8 @@ class BokehHeatmapResize:
     """
     This object uses an offline-mode of bokeh to create a heatmap of the
     trade data. To do this we use a CustomJS Top-N slider. So there actually
-    is a bit of javascript in this class.
-    Resulting HTML file size is: 80 KB
+    is a bit of JavaScript in this class.
+    The resulting HTML file size is: 80 KB
     """
 
     title = "Exporter → Importer heatmap (resize by Top-N countries)"

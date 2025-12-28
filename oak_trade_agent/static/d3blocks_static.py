@@ -18,7 +18,7 @@ from oak_trade_agent.paths import get_output_dir
 ###############################################################################
 class D3BlocksHeatmap:
     """
-    Resulting HTML file size is: 129KB
+    The resulting HTML file size is: 129KB
     """
 
     title = "Exporter → Importer heatmap (Top-N countries)"

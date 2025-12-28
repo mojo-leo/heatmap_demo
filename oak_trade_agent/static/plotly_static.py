@@ -24,7 +24,7 @@ class PlotlyHeatmapOffline:
     If max_n is large, the HTML can get big.
     To reduce size, change the loop to only generate a subset
     (e.g., steps of 1 up to 30, then steps of 5/10), or cap max_n.
-    Resulting HTML file size is: 12.2 MB
+    The resulting HTML file size is: 12.2 MB
     """
 
     title = "Exporter → Importer heatmap (resize by Top-N countries)"

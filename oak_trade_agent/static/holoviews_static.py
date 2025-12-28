@@ -23,7 +23,7 @@ pn.extension()
 ###############################################################################
 class HoloViewsHeatmapStatic:
     """
-    Resulting HTML file size is: 38.4 MB
+    The resulting HTML file size is: 38.4 MB
     """
 
     title = "Exporter → Importer heatmap (resize by Top-N countries)"
