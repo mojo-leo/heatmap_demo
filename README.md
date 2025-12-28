@@ -42,7 +42,7 @@ Basically we end up with a dataframe that looks like this:
 A heatmap that is interactive and can be seen in the browser. We want the interface to have a slider that goes from 1 to N, and changes the number of countries that are displayed on the heatmap. Here is an example:
 
 <p align="center">
-<img src="docs/vega_screenshot.png?raw=true" alt="Logo showing a stack of wood">
+<img src="docs/vega_screenshot.png?raw=true" alt="Screenshot of the vega_lite method">
 </p>
 
 ## Call
@@ -130,3 +130,25 @@ Or see "JupyterLite" where notebooks open and run without a backend kernel (also
 You just need to serve this directory statically and point your browser to it:
 
     $ python -m http.server
+
+## Conclusion
+
+The criteria to evaluate how good the heatmap is are the following:
+ 
+- Shows the scale as a nice color gradient with correct units.
+- Shows the x and y labels to explicit which is importer and which is exporter.
+- Ability to reserve a special separate color for the null values, such as white (while 0.001 would switch to pale yellow).
+- Ability to display a hover tooltip with the correct label and units.
+- The slider should be wide and have clear labeling.
+- The labels on the x and y axes should be rotated when needed for clear display.
+- Page should feel responsive.
+
+One of the nicest interfaces is the one called `tui_static` pictured below:
+
+<p align="center">
+<img src="docs/tui_screenshot.png?raw=true" alt="Screenshot of the tui_static method">
+</p>
+
+## Future
+
+- It would be nice to have a logarithmic color scale.
