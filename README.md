@@ -1,4 +1,4 @@
-# `oak_trade_agent` version 0.2.0
+# `oak_trade_agent` version 0.3.0
 
 `oak_trade_agent` is a python package to help answer questions on oak trade statistics based on bilateral Comtrade data. In the starting phase it will provide only a simple visualization of sample data based on oak roundwood and sawnwood (reference number 440791)
 
