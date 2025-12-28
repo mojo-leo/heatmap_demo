@@ -136,19 +136,18 @@ You just need to serve this directory statically and point your browser to it:
 The criteria to evaluate how good the heatmap is are the following:
  
 - Shows the scale as a nice color gradient with correct units.
-- Shows the x and y labels to explicit which is importer and which is exporter.
-- Ability to reserve a special separate color for the null values, such as white (while 0.001 would switch to pale yellow).
+- It would be nice to have a logarithmic color scale.
+- It would be nice to show the location on the color scale when selecting a cell.
+- Shows the x and y axis labels to understand which is importer and which is exporter.
 - Ability to display a hover tooltip with the correct label and units.
+- Ability to reserve a special separate color for the null values, such as white (while 0.001 would switch to pale yellow).
 - The slider should be wide and have clear labeling.
-- The labels on the x and y axes should be rotated when needed for clear display.
-- Page should feel responsive.
+- The labels on the x and y ticks should be rotated when needed for clear display.
+- Page should feel responsive when changing the slider.
+- The heatmap size should scale with the size of the window.
 
 One of the nicest interfaces is the one called `tui_static` pictured below:
 
 <p align="center">
 <img src="docs/tui_screenshot.png?raw=true" alt="Screenshot of the tui_static method">
 </p>
-
-## Future
-
-- It would be nice to have a logarithmic color scale.
