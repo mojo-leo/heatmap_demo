@@ -1,6 +1,12 @@
-# Ignore input data and output
+# Ignore input data
 /input/
-/output/
+
+# Ignore most of output, but some files we want to keep for demo
+/output/*
+!/output/tui_static.html
+!/output/vega_static.html
+!/output/bokeh_static.html
+!/output/echarts.html
 
 # Temporary files
 .DS_Store
