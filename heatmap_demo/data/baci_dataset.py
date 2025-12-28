@@ -16,7 +16,7 @@ from rich.padding import Padding
 from rich.panel import Panel
 
 # Internal modules
-from oak_trade_agent.paths import get_input_dir, get_output_dir
+from heatmap_demo.paths import get_input_dir, get_output_dir
 
 
 ###############################################################################

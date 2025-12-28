@@ -5,4 +5,4 @@
 __version__ = "0.3.0"
 
 # Constants
-project_url = "https://github.com/mojo-leo/oak_trade_agent"
+project_url = "https://github.com/mojo-leo/heatmap_demo"

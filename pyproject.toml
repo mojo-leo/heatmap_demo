@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oak_trade_agent"
+name = "heatmap_demo"
 version = "0.3.0"
 
 description = "This python package helps answer questions on oak trade statistics based on bilateral Comtrade data."
@@ -16,7 +16,7 @@ authors = [
   { name = "Lucas Sinclair" }
 ]
 
-urls = { Homepage = "https://github.com/mojo-leo/oak_trade_agent/" }
+urls = { Homepage = "https://github.com/mojo-leo/heatmap_demo/" }
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -51,7 +51,7 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["oak_trade_agent"]
+packages = ["heatmap_demo"]
 
 [tool.black]
 line-length = 88

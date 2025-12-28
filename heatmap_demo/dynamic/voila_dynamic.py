@@ -14,8 +14,8 @@ import plotly.graph_objects as go
 from IPython.display import display
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
-from oak_trade_agent.paths import get_output_dir
+from heatmap_demo.data.baci_dataset import baci
+from heatmap_demo.paths import get_output_dir
 
 
 ###############################################################################
@@ -24,7 +24,7 @@ class VoilaHeatmap:
     title = "Exporter → Importer heatmap (Top-N countries by total quantity)"
 
     # If you move this file, update the import below
-    NOTEBOOK_IMPORT = "from oak_trade_agent.dynamic.voila_dynamic import voila_heatmap"
+    NOTEBOOK_IMPORT = "from heatmap_demo.dynamic.voila_dynamic import voila_heatmap"
 
     @cached_property
     def df(self) -> pd.DataFrame:

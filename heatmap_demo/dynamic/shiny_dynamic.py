@@ -13,7 +13,7 @@ from shiny import App, reactive, render, ui
 from shinywidgets import output_widget, render_widget
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
+from heatmap_demo.data.baci_dataset import baci
 
 
 ###############################################################################

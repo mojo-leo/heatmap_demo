@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 
 # Internal modules
-from oak_trade_agent.with_js.template import TemplateHTML
+from heatmap_demo.with_js.template import TemplateHTML
 
 
 ###############################################################################
-class ECharts(TemplateHTML):
-    template_name = "echarts.html"
+class ChartJS(TemplateHTML):
+    template_name = "chartjs.html"
 
 
 ###############################################################################
-echarts = ECharts()
+chartjs = ChartJS()
 if __name__ == "__main__":
-    echarts()
+    chartjs()
+

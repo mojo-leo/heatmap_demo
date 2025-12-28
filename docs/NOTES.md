@@ -55,7 +55,7 @@ The first prototype implements only a visualization.
 
 Load the data from the BACI website:
 
-    cd $HOME/repos/oak_trade_agent/data
+    cd $HOME/repos/heatmap_demo/input
     wget https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS22_V202501.zip
 
 Uncompress:

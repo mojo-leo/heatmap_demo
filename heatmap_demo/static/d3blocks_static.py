@@ -11,8 +11,8 @@ import pandas as pd
 from d3blocks import D3Blocks
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
-from oak_trade_agent.paths import get_output_dir
+from heatmap_demo.data.baci_dataset import baci
+from heatmap_demo.paths import get_output_dir
 
 
 ###############################################################################

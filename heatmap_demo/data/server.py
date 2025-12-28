@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
+from heatmap_demo.data.baci_dataset import baci
 
 ###############################################################################
 # Create the server

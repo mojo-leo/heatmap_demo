@@ -15,8 +15,8 @@ import plotly.graph_objects as go
 import solara
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
-from oak_trade_agent.paths import get_output_dir
+from heatmap_demo.data.baci_dataset import baci
+from heatmap_demo.paths import get_output_dir
 
 
 ###############################################################################
@@ -114,7 +114,7 @@ class SolaraHeatmap:
         script_path = Path(__file__).resolve()
 
         env = os.environ.copy()
-        # Ensure the repo root is on PYTHONPATH so `oak_trade_agent` imports work.
+        # Ensure the repo root is on PYTHONPATH so `heatmap_demo` imports work.
         repo_root = Path(__file__).resolve().parents[2]
         env["PYTHONPATH"] = str(repo_root) + (
             os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else ""

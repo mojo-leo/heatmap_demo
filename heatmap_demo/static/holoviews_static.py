@@ -12,8 +12,8 @@ import panel as pn
 from panel.io import save as pn_save
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
-from oak_trade_agent.paths import get_output_dir
+from heatmap_demo.data.baci_dataset import baci
+from heatmap_demo.paths import get_output_dir
 
 # Set the backend for HoloViews
 hv.extension("bokeh")

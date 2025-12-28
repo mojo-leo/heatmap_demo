@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Internal modules
-from oak_trade_agent.with_js.template import TemplateHTML
+from heatmap_demo.with_js.template import TemplateHTML
 
 
 ###############################################################################

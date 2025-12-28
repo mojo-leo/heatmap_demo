@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # The main object of our package
-from oak_trade_agent.static.vega_heatmap import vega_heatmap
+from heatmap_demo.static.vega_static import vega_heatmap
 
 
 # The main function to run when we are called #

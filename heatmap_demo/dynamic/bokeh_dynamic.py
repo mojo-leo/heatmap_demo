@@ -21,7 +21,7 @@ from bokeh.server.server import Server
 from bokeh.transform import transform
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
+from heatmap_demo.data.baci_dataset import baci
 
 
 ###############################################################################

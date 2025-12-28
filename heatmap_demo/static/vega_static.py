@@ -11,8 +11,8 @@ from pathlib import Path
 import altair
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
-from oak_trade_agent.paths import get_output_dir
+from heatmap_demo.data.baci_dataset import baci
+from heatmap_demo.paths import get_output_dir
 
 
 ###############################################################################

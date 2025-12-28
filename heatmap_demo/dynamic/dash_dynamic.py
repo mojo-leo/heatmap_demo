@@ -10,7 +10,7 @@ import plotly.graph_objects as go
 from dash import Dash, Input, Output, dcc, html
 
 # Internal modules
-from oak_trade_agent.data.baci_dataset import baci
+from heatmap_demo.data.baci_dataset import baci
 
 
 ###############################################################################

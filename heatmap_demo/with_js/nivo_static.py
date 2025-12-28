@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # Internal modules
-from oak_trade_agent.with_js.template import TemplateHTML
+from heatmap_demo.with_js.template import TemplateHTML
 
 
 ###############################################################################
-class TUIStatic(TemplateHTML):
-    template_name = "tui_static.html"
+class NivoStatic(TemplateHTML):
+    template_name = "nivo_static.html"
 
 
 ###############################################################################
-tui_static = TUIStatic()
+nivo_static = NivoStatic()
 if __name__ == "__main__":
-    tui_static()
+    nivo_static()
