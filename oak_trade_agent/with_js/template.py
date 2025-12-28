@@ -28,9 +28,10 @@ class TemplateHTML:
         # Wrap the base64 string in quotes to make it a valid JavaScript string literal
         return html_content.replace("__EMBEDDED_DATA__", f'"{baci.json_gzip_base64}"')
 
-    def __call__(self) -> Path:
+    def __call__(self, open_browser: bool = False) -> Path:
         output_path = get_output_dir() / self.template_name
         output_path.write_text(self.body)
         print(f"Saved {output_path} — open it in your browser.")
-        webbrowser.open(f"file://{output_path.absolute()}")
+        if open_browser:
+            webbrowser.open(f"file://{output_path.absolute()}")
         return output_path
