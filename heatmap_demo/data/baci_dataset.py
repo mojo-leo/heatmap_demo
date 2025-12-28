@@ -58,7 +58,7 @@ class BaciDataset:
             " patient. The result will be saved to '%s'. You can"
             " override this by setting the $%s environment variable."
         )
-        msg = msg % (self.csv_name, self.zip_path, "OAK_TRADE_INPUT_DIR")
+        msg = msg % (self.csv_name, self.zip_path, "HEATMAP_DEMO_INPUT_DIR")
         title = "Large Download"
         rprint(Padding(Panel(msg, title=title, padding=2, expand=False), (2, 10)))
         download_file(self.url, self.zip_path, md5=self.md5_sum)

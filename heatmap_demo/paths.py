@@ -8,7 +8,7 @@ from pathlib import Path
 
 @lru_cache
 def get_input_dir() -> Path:
-    if v := os.environ.get("OAK_TRADE_INPUT_DIR"):
+    if v := os.environ.get("HEATMAP_DEMO_INPUT_DIR"):
         return Path(v)
     candidate = Path(__file__).resolve().parents[1] / "input"
     if candidate.exists():
@@ -18,7 +18,7 @@ def get_input_dir() -> Path:
 
 @lru_cache
 def get_output_dir() -> Path:
-    if v := os.environ.get("OAK_TRADE_OUTPUT_DIR"):
+    if v := os.environ.get("HEATMAP_DEMO_OUTPUT_DIR"):
         return Path(v)
     candidate = Path(__file__).resolve().parents[1] / "output"
     if candidate.exists():
