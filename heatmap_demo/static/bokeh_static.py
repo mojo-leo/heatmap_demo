@@ -24,7 +24,7 @@ from bokeh.palettes import brewer, interp_palette
 from bokeh.plotting import figure
 
 # Internal modules
-from common import split_thousands
+from ..common import split_thousands
 from heatmap_demo import project_url
 from heatmap_demo.data.baci_dataset import baci
 from heatmap_demo.paths import get_output_dir

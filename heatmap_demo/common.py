@@ -56,3 +56,5 @@ def split_thousands(value: Any, decimals: int = 2) -> str:
         return split_thousands(float(value), decimals=decimals)
     except Exception:
         return str(value)
+
+

@@ -6,6 +6,7 @@ from functools import lru_cache
 from pathlib import Path
 
 
+###############################################################################
 @lru_cache
 def get_input_dir() -> Path:
     if v := os.environ.get("HEATMAP_DEMO_INPUT_DIR"):
@@ -16,6 +17,7 @@ def get_input_dir() -> Path:
     raise RuntimeError("Input data directory not found.")
 
 
+###############################################################################
 @lru_cache
 def get_output_dir() -> Path:
     if v := os.environ.get("HEATMAP_DEMO_OUTPUT_DIR"):
