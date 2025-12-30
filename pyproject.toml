@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "heatmap_demo"
-version = "0.3.0"
+version = "1.0.0"
 
 description = "This python package helps answer questions on oak trade statistics based on bilateral Comtrade data."
 readme = "README.md"

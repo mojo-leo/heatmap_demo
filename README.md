@@ -1,11 +1,11 @@
-# `heatmap_demo` version 0.3.0
+# `heatmap_demo` version 1.0.0
 
 `heatmap_demo` is a python package to help answer questions on oak trade statistics based on bilateral Comtrade data. In the starting phase it will provide only a simple visualization of sample data based on oak roundwood and sawnwood (reference number 440791)
 
 Our first objective is simply to compare browser-based plotting methods by generating a heatmap. For this, we explore several different strategies and multiple technologies.
 
 <p align="center">
-<img height="256" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood and a heatmap">
+<a href="output/bokeh_static.html"><img height="256" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood and a heatmap"></a>
 </p>
 
 
@@ -145,9 +145,3 @@ The criteria to evaluate how good the heatmap is are the following:
 - The labels on the x and y ticks should be rotated when needed for clear display.
 - Page should feel responsive when changing the slider.
 - The heatmap size should scale with the size of the window.
-
-One of the nicest interfaces is the one called `tui_static` pictured below:
-
-<p align="center">
-<img src="docs/tui_screenshot.png?raw=true" alt="Screenshot of the tui_static method">
-</p>
