@@ -66,7 +66,7 @@ The first idea is to write all the code in python while avoiding JavaScript and 
 
 - [x] [`heatmap_demo/static/vega_static.py`](https://mojo-leo.github.io/heatmap_demo/output/vega_static.html) (with cdn)
 - [x] [`heatmap_demo/static/bokeh_static.py`](https://mojo-leo.github.io/heatmap_demo/output/bokeh_static.html) (with cdn and a bit of js)
-- [x] [`heatmap_demo/static/holoviews_static.py`](https://mojo-leo.github.io/heatmap_demo/output/holoviews_static.html) (huge file and cdn)
+- [x] `heatmap_demo/static/holoviews_static.py (huge file and cdn)
 - [x] `heatmap_demo/static/plotly_static.py` (huge file no cdn)
 - [x] `heatmap_demo/static/d3blocks_static.py` (no slider)
 
