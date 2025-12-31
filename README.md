@@ -64,11 +64,11 @@ https://github.com/hal9ai/awesome-dataviz
 
 The first idea is to write all the code in python while avoiding JavaScript and create a standalone HTML file that can be served in a static fashion. Not many solutions exist, the main one is `altair` (`vega_lite`). By being hacky it's possible to use `holoviews` or even `plotly` to obtain a similar result, but these tests produce huge file sizes. With a bit of in-line javascript we can even do a hack with `bokeh` and get a small file size. Honorable mention for `d3blocks` also though it doesn't provide a slider.
 
-- [x] `heatmap_demo/static/vega_static.py` (with cdn)
-- [x] `heatmap_demo/static/bokeh_static.py` (with cdn and a bit of js)
-- [x] `heatmap_demo/static/holoviews_static.py` (huge file and cdn)
-- [x] `heatmap_demo/static/plotly_static.py` (huge file no cdn)
-- [x] `heatmap_demo/static/d3blocks_static.py` (no slider)
+- [x] [`heatmap_demo/static/vega_static.py`](https://mojo-leo.github.io/heatmap_demo/output/vega_static.html) (with cdn)
+- [x] [`heatmap_demo/static/bokeh_static.py`](https://mojo-leo.github.io/heatmap_demo/output/bokeh_static.html) (with cdn and a bit of js)
+- [x] [`heatmap_demo/static/holoviews_static.py`](https://mojo-leo.github.io/heatmap_demo/output/holoviews_static.html) (huge file and cdn)
+- [x] [`heatmap_demo/static/plotly_static.py`](https://mojo-leo.github.io/heatmap_demo/output/plotly_static.html) (huge file no cdn)
+- [x] [`heatmap_demo/static/d3blocks_static.py`](https://mojo-leo.github.io/heatmap_demo/output/d3blocks_static.html) (no slider)
 
 ### 2) Dynamic in Python
 
@@ -102,13 +102,13 @@ Summary:
 
 The third approach is to depart from python, and create a single HTML file that embeds the dataframe as well as the necessary JavaScript to perform all interactive operations on the client side.
 
-- [x] `heatmap_demo/with_js/d3_static.py`
-- [x] `heatmap_demo/with_js/echarts.py`
-- [x] `heatmap_demo/with_js/observable.py`
-- [x] `heatmap_demo/with_js/chartjs.py`
-- [x] `heatmap_demo/with_js/nivo_static.py`
-- [x] `heatmap_demo/with_js/tui_static.py` (appealing interface)
-- [ ] `heatmap_demo/with_js/visx_static.py`
+- [x] [`heatmap_demo/with_js/d3_static.py`](https://mojo-leo.github.io/heatmap_demo/output/d3_static.html)
+- [x] [`heatmap_demo/with_js/echarts.py`](https://mojo-leo.github.io/heatmap_demo/output/echarts.html)
+- [x] [`heatmap_demo/with_js/observable.py`](https://mojo-leo.github.io/heatmap_demo/output/observable.html)
+- [x] [`heatmap_demo/with_js/chartjs.py`](https://mojo-leo.github.io/heatmap_demo/output/chartjs.html)
+- [x] [`heatmap_demo/with_js/nivo_static.py`](https://mojo-leo.github.io/heatmap_demo/output/nivo_static.html)
+- [x] [`heatmap_demo/with_js/tui_static.py`](https://mojo-leo.github.io/heatmap_demo/output/tui_static.html) (appealing interface)
+- [ ] [`heatmap_demo/with_js/visx_static.py`](https://mojo-leo.github.io/heatmap_demo/output/visx_static.html)
 
 ### 4) Dynamic in Javascript
 
