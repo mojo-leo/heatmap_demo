@@ -8,6 +8,11 @@ Our first objective is simply to compare browser-based plotting methods by gener
 <img height="256" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood and a heatmap">
 </p>
 
+#TODO:
+
+Fix the Dash dynamic which is not working.
+Fix the WASM pyiodide example which is not working.
+Add github pages for output.
 
 ## Input data
 
