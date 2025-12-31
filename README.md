@@ -42,8 +42,8 @@ Basically we end up with a dataframe that looks like this:
 A heatmap that is interactive and can be seen in the browser. We want the interface to have a slider that goes from 1 to N, and changes the number of countries that are displayed on the heatmap. Here is an example:
 
 <p align="center">
-<a href="output/bokeh_static.html">
-<img src="docs/vega_screenshot.png?raw=true" alt="Screenshot of the vega_lite method">
+<a href="https://mojo-leo.github.io/heatmap_demo/output/bokeh_static.html">
+<img src="docs/bokeh_screenshot.png?raw=true" alt="Screenshot of the bokeh_static method">
 </a>
 </p>
 
