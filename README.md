@@ -8,10 +8,6 @@ Our first objective is simply to compare browser-based plotting methods by gener
 <img height="256" src="docs/logo.png?raw=true" alt="Logo showing a stack of wood and a heatmap">
 </p>
 
-#TODO:
-
-Fix the WASM pyiodide example which is not working.
-
 ## Input data
 
 Based on a downloadable zip file with information on trade data from BACI.
