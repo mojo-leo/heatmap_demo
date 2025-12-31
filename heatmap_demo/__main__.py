@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 # The main object of our package
-from heatmap_demo.static.vega_static import vega_heatmap
+from heatmap_demo.static.bokeh_static import bokeh_heatmap
 
 
 # The main function to run when we are called #
 def main():
-    return vega_heatmap()
+    return bokeh_heatmap(True)
 
 
 # Execute when run, not when imported
