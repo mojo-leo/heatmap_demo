@@ -67,8 +67,8 @@ The first idea is to write all the code in python while avoiding JavaScript and 
 - [x] [`heatmap_demo/static/vega_static.py`](https://mojo-leo.github.io/heatmap_demo/output/vega_static.html) (with cdn)
 - [x] [`heatmap_demo/static/bokeh_static.py`](https://mojo-leo.github.io/heatmap_demo/output/bokeh_static.html) (with cdn and a bit of js)
 - [x] [`heatmap_demo/static/holoviews_static.py`](https://mojo-leo.github.io/heatmap_demo/output/holoviews_static.html) (huge file and cdn)
-- [x] [`heatmap_demo/static/plotly_static.py`](https://mojo-leo.github.io/heatmap_demo/output/plotly_static.html) (huge file no cdn)
-- [x] [`heatmap_demo/static/d3blocks_static.py`](https://mojo-leo.github.io/heatmap_demo/output/d3blocks_static.html) (no slider)
+- [x] `heatmap_demo/static/plotly_static.py` (huge file no cdn)
+- [x] `heatmap_demo/static/d3blocks_static.py` (no slider)
 
 ### 2) Dynamic in Python
 
@@ -107,8 +107,8 @@ The third approach is to depart from python, and create a single HTML file that 
 - [x] [`heatmap_demo/with_js/observable.py`](https://mojo-leo.github.io/heatmap_demo/output/observable.html)
 - [x] [`heatmap_demo/with_js/chartjs.py`](https://mojo-leo.github.io/heatmap_demo/output/chartjs.html)
 - [x] [`heatmap_demo/with_js/nivo_static.py`](https://mojo-leo.github.io/heatmap_demo/output/nivo_static.html)
-- [x] [`heatmap_demo/with_js/tui_static.py`](https://mojo-leo.github.io/heatmap_demo/output/tui_static.html) (appealing interface)
-- [ ] [`heatmap_demo/with_js/visx_static.py`](https://mojo-leo.github.io/heatmap_demo/output/visx_static.html)
+- [x] [`heatmap_demo/with_js/tui_static.py`](https://mojo-leo.github.io/heatmap_demo/output/tui_static.html) (interesting interface)
+- [ ] `heatmap_demo/with_js/visx_static.py`
 
 ### 4) Dynamic in Javascript
 

@@ -6,7 +6,12 @@
 !/output/tui_static.html
 !/output/vega_static.html
 !/output/bokeh_static.html
+!/output/d3_static.html
 !/output/echarts.html
+!/output/observable.html
+!/output/chartjs.html
+!/output/nivo_static.html
+!/output/tui_static.html
 
 # Temporary files
 .DS_Store
