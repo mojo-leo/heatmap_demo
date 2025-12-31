@@ -10,9 +10,7 @@ Our first objective is simply to compare browser-based plotting methods by gener
 
 #TODO:
 
-Fix the Dash dynamic which is not working.
 Fix the WASM pyiodide example which is not working.
-Add github pages for output.
 
 ## Input data
 

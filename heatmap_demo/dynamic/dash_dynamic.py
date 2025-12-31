@@ -16,6 +16,7 @@ from heatmap_demo.data.baci_dataset import baci
 ###############################################################################
 class DashHeatmap:
     """
+    Run with `python`, not `ipython`, for a blocking server.
     Dash app:
     - Slider controls Top-N countries
     - Plotly Heatmap requires a dense 2D grid -> we build the full pivot once
@@ -123,9 +124,17 @@ class DashHeatmap:
         return app
 
     def __call__(
-        self, host: str = "127.0.0.1", port: int = 8050, debug: bool = True
+        self,
+        host: str = "127.0.0.1",
+        port: int = 8050,
     ) -> None:
-        self.app.run(host=host, port=port, debug=debug)
+        self.app.run(
+            host=host,
+            port=port,
+            debug=False,
+            use_reloader=False,
+            jupyter_mode="external",
+        )
 
 
 ###############################################################################
